@@ -1,0 +1,92 @@
+mutation SeedDatabase @auth(level: NO_ACCESS) @transaction {
+  user_insertMany(data: [
+    {
+      id: "6b29c7fd-d27a-4ad4-b04a-7075f991de6b",
+      displayName: "Demo User 1",
+      email: "demouser1@example.com",
+      createdAt: "2024-04-01T10:00:00Z"
+    },
+    {
+      id: "8e271646-98f3-4a49-a0f2-e5411d581986",
+      displayName: "Demo User 2",
+      email: "demouser2@example.com",
+      createdAt: "2024-04-05T14:30:00Z"
+    }
+  ])
+  exercise_insertMany(data: [
+    {
+      id: "a1b2c3d4-e5f6-4789-90ab-cdef01234567",
+      name: "Bench Press",
+      muscleGroup: "Chest",
+      createdAt: "2024-04-01T09:00:00Z"
+    },
+    {
+      id: "f8g9h0i1-j2k3-4l5m-6789-0abcdef01234",
+      name: "Squats",
+      muscleGroup: "Legs",
+      createdAt: "2024-04-01T09:15:00Z"
+    }
+  ])
+  workoutRoutine_insertMany(data: [
+    {
+      id: "c5d6e7f8-90ab-4c34-8def-0123456789ab",
+      userId: "6b29c7fd-d27a-4ad4-b04a-7075f991de6b",
+      name: "Chest Day",
+      isPublic: true,
+      createdAt: "2024-04-01T11:00:00Z"
+    },
+    {
+      id: "7e8f9g0a-bc12-4d56-7efa-23456789abcd",
+      userId: "8e271646-98f3-4a49-a0f2-e5411d581986",
+      name: "Leg Day",
+      isPublic: false,
+      createdAt: "2024-04-05T15:00:00Z"
+    }
+  ])
+  routineExercise_insertMany(data: [
+    {
+      workoutRoutineId: "c5d6e7f8-90ab-4c34-8def-0123456789ab",
+      exerciseId: "a1b2c3d4-e5f6-4789-90ab-cdef01234567",
+      sets: 3,
+      reps: 8,
+      position: 1
+    },
+    {
+      workoutRoutineId: "7e8f9g0a-bc12-4d56-7efa-23456789abcd",
+      exerciseId: "f8g9h0i1-j2k3-4l5m-6789-0abcdef01234",
+      sets: 4,
+      reps: 6,
+      position: 1
+    }
+  ])
+    loggedWorkout_insertMany(data: [
+    {
+      id: "074c90c2-6748-4ff6-8af1-884f3d59eb49",
+      userId: "6b29c7fd-d27a-4ad4-b04a-7075f991de6b",
+      date: "2024-04-02",
+      createdAt: "2024-04-02T10:00:00Z"
+    },
+        {
+      id: "9a4c90c2-6748-4ff6-8af1-884f3d59eb49",
+      userId: "8e271646-98f3-4a49-a0f2-e5411d581986",
+      date: "2024-04-06",
+      createdAt: "2024-04-06T10:00:00Z"
+    }
+  ])
+      loggedExercise_insertMany(data: [
+    {
+      loggedWorkoutId: "074c90c2-6748-4ff6-8af1-884f3d59eb49",
+      exerciseId: "a1b2c3d4-e5f6-4789-90ab-cdef01234567",
+      sets: 3,
+      reps: 8,
+      weight: 225
+    },
+        {
+      loggedWorkoutId: "9a4c90c2-6748-4ff6-8af1-884f3d59eb49",
+      exerciseId: "f8g9h0i1-j2k3-4l5m-6789-0abcdef01234",
+      sets: 4,
+      reps: 6,
+      weight: 300
+    }
+  ])
+}
