@@ -10,6 +10,19 @@ import { useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { styles } from "./style";
 
+export function ImgDefault() {
+  return (
+    <View style={styles.container}>
+      <View style={styles.imageWrapper}>
+        <Image
+          source={require("../../../assets/Logo.png")} // imagem padrão
+          style={styles.img}
+        />
+      </View>
+    </View>
+  );
+}
+
 export function ImgProfile({ image, onChangeImage }) {
   const [modalVisible, setModalVisible] = useState(false);
 
