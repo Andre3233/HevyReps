@@ -1,10 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
   View,
+  Animated,
 } from "react-native";
 import { styles } from "../styles/UserRegister.style";
 import { useState, useEffect } from "react";
@@ -17,6 +19,7 @@ import {
 import { ImgProfile } from "../components/ImgProfile";
 import { Button } from "../components/Button";
 import { useIsFocused } from "@react-navigation/native";
+import { registerUser } from "../api/registerUser";
 
 export default function UserRegister({ route }) {
   const [image, setImage] = useState(null);
@@ -24,6 +27,7 @@ export default function UserRegister({ route }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
     username: null,
     email: null,
@@ -37,7 +41,7 @@ export default function UserRegister({ route }) {
     const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return Regex.test(email);
   }
-  function handleRegister() {
+  async function handleRegister() {
     //Aqui os inputs passão por uma validação antes de serem enviadados para o Back
     const newErros = {
       username: null,
@@ -66,7 +70,32 @@ export default function UserRegister({ route }) {
     setErrors(newErros);
 
     const hasError = Object.values(newErros).some((e) => e !== null);
-    if (hasError) return;
+    if (hasError) return; // Se ouver erro não envia nada para o BAck
+
+    //Envia os dadoa para o Back
+    try {
+      setLoading(true);
+      const data = await registerUser({
+        username,
+        email,
+        password,
+        profile_image_url: image || null,
+      });
+      alert("Conta criada com sucesso! Bem vindo " + data.data.username);
+    } catch (err) {
+      let message = "Ocorreu um erro inesperado. Tente novamente.";
+
+      if (err?.detail) {
+        if (Array.isArray(err.detail)) {
+          //Erros da API
+          message = err.detail[0].msg;
+        } else {
+          //Erros manuais(email / user repetidos)
+          message = err.detail;
+        }
+      }
+      Alert.alert("Erro", message);
+    }
   }
 
   return (
@@ -104,7 +133,19 @@ export default function UserRegister({ route }) {
               error={errors.confirmPassword}
             />
 
-            <Button title="Criar Conta" onPress={handleRegister} />
+            <Button
+              title="Criar Conta"
+              onPress={handleRegister}
+              disabled={loading}
+            >
+              {loading ? (
+                <View>
+                  <Text style={styles.title}>A criar conta</Text>
+                </View>
+              ) : (
+                "Criar Conta"
+              )}
+            </Button>
           </View>
         </View>
       </ScrollView>
