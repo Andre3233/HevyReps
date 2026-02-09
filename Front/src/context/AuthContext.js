@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "../api/loginUser";
+import * as SecureStore from "expo-secure-store";
+import { jsx } from "react/jsx-runtime";
 
 export const AuthContext = createContext();
 
@@ -10,45 +12,51 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //Quando a app abre tenta carregar sessão
     async function loadStorageData() {
-      const storageToken = await AsyncStorage.getItem("@token");
-      const storageUser = await AsyncStorage.getItem("@user");
+      try {
+        const storedToken = await SecureStore.getItemAsync("userToken");
+        const storedUser = await AsyncStorage.getItem("@user");
 
-      if (storageToken && storageUser) {
-        setToken(storageToken);
-        setUser(JSON.parse(storageUser));
+        if (storedToken) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (e) {
+        console.log("Erro ao carregar sesão", e);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     loadStorageData();
   }, []);
 
-  async function signIn(identifier, password) {
-    try {
-      const data = await loginUser(identifier, password);
-      setToken(data.access_token);
-      setUser(data.user);
+  async function signIn(token, user) {
+    await SecureStore.setItemAsync("userToken", token);
+    await AsyncStorage.setItem("@user", JSON.stringify(user));
 
-      await AsyncStorage.setItem("@token", data.access_token);
-      await AsyncStorage.setItem("@user", JSON.stringify(data.user));
-
-      return { success: true };
-    } catch (err) {
-      console.log("Erro no login: ", err);
-      return { success: false, message: err.detail || "Erro desconhecido" };
-    }
+    setToken(token);
+    setUser(user);
   }
 
-  async function singOut() {
+  async function signOut() {
+    await SecureStore.deleteItemAsync("userToken");
+    await AsyncStorage.removeItem("@user");
+
     setToken(null);
     setUser(null);
-    await AsyncStorage.removeItem("@token");
-    await AsyncStorage.removeItem("@user");
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, signIn, singOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        signed: !!token && !!user,
+        signIn,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

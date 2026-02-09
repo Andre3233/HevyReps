@@ -15,17 +15,17 @@ import { Button, LinkButton } from "../components/Button";
 import { useNavigation } from "@react-navigation/native";
 import { loginUser } from "../api/loginUser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SecureStore from "expo-secure-store";
-//import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Login() {
-  //const { singIn } = useContext(A)
   const navigation = useNavigation();
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ identifier: null, password: null });
   const [loading, setLoading] = useState(false);
+
+  const { signIn } = useContext(AuthContext);
 
   async function handleLogin() {
     //Validação simples antees de enviar para o Back
@@ -44,18 +44,12 @@ export default function Login() {
     setLoading(true);
     try {
       const result = await loginUser(identifier, password);
-      console.log("Login feito com sucesso: ", result);
-
-      await SecureStore.setItemAsync("userToken", result.access_token);
-      await SecureStore.setItemAsync("userData", JSON.stringify(result.user));
+      await signIn(result.access_token, result.user);
     } catch (error) {
-      console.log("Erro no Login: ", error);
-
       setErrors({
         identifier: error?.detail || "Credenciais inválidas",
         password: null,
       });
-      setLoading(false);
     } finally {
       setLoading(false);
     }

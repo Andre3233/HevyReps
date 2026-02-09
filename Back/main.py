@@ -1,5 +1,6 @@
 # cd Back
-# uvicorn main:app --reload
+# C:/Users/André/Desktop/PAP/HevyReps/Back/venv/Scripts/Activate.ps1
+# uvicorn main:app --reload --host 0.0.0.0 --port 8000
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.user import router as user_router 
