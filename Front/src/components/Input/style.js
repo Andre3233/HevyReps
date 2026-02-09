@@ -7,7 +7,8 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.inputBackground,
     color: colors.text,
     fontSize: RFValue(12),
-    padding: RFValue(16),
+    paddingVertical: RFValue(16),
+    paddingHorizontal: RFValue(16),
     borderRadius: RFValue(8),
     marginTop: RFValue(18),
   },
@@ -20,5 +21,26 @@ export const styles = StyleSheet.create({
     color: "#ef4444",
     marginTop: RFValue(6),
     fontSize: RFValue(14),
+  },
+
+  inputWrapper: {
+    position: "relative",
+  },
+
+  eyeButton: {
+    position: "absolute",
+    right: RFValue(12),
+    top: RFValue(19),
+    bottom: RFValue(0),
+    justifyContent: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    width: RFValue(40),
+  },
+
+  eyeIcon: {
+    width: RFValue(20),
+    height: RFValue(20),
+    resizeMode: "contain",
   },
 });

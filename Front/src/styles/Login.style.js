@@ -10,6 +10,10 @@ export const styles = StyleSheet.create({
   },
 
   scrollview: {
+    flex: 1,
+  },
+
+  scrollContent: {
     flexGrow: 1,
   },
 

@@ -17,4 +17,15 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: RFValue(16),
   },
+
+  LinkButton: {
+    alignItems: "center",
+  },
+  LinkButtonText: {
+    color: colors.text,
+    fontSize: RFValue(13),
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: RFValue(6),
+  },
 });
