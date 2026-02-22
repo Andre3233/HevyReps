@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, status
 from models.login_model import userLogin
 from utils.security import verify_password
-from utils.jwt_utils import create_access_token
+from utils.jwt_utils import create_access_token, create_refresh_token
 from core.firebase_utils import get_db
+from datetime import datetime, timedelta
 
 router = APIRouter()
 
@@ -23,10 +24,21 @@ def login(user: userLogin):
     if not verify_password(user.password, user_in_db["password_hash"]):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
     
-    token = create_access_token({"sub": user_in_db["username"]})
+    #Atribuição tokens
+    access_token = create_access_token(
+        {"sub": user_in_db["username"]}, expires_delta = timedelta(hours=5)
+    )
+    refresh_token = create_refresh_token(
+        {"sub": user_in_db["username"]}, expires_delta = timedelta(days=90)
+    )
 
-    return {"access_token": token, "token_type": "bearer", "user": {
-        "username": user_in_db["username"],
-        "email": user_in_db["email"],
-        "profile_image_url": user_in_db.get("profile_image_url")
+    return {"access_token": access_token, "token_type": "bearer", "user": {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+        "user": {
+            "username": user_in_db["username"],
+            "email": user_in_db["email"],
+            "profile_image_url": user_in_db.get("profile_image_url")
+        }
     }}

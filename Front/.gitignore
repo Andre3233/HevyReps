@@ -44,3 +44,8 @@ yarn-error.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Arquivos para ainda não prontos
+src/screens/UserTreins.js
+src/navigation/ButtonTab.js
+src/styles/UserTreins.style.js

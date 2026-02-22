@@ -132,7 +132,7 @@ export default function UserRegister({ route }) {
           <StatusBar style="dark" />
           <View style={styles.header}>
             <View style={styles.headerTop}>
-              <Text style={styles.title}>Cadastro</Text>
+              <Text style={styles.title}>Registro</Text>
               <ImgProfile image={image} onChangeImage={setImage} />
             </View>
 

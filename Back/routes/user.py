@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from models.user_model import UserCreate 
 from utils.security import hash_password # Função do hasher da pass
-from core.firebase_utils import create_user_safe
+from core.firebase_utils import create_user
 
 router = APIRouter() #Server modular
 
@@ -11,7 +11,7 @@ def register(user: UserCreate): # Enspoint para criar um novo utilizador
 
     try:
         #Criar user para o Firebase
-        new_user = create_user_safe(
+        new_user = create_user(
             username=user.username,
             email=user.email,
             password_hash=hashed_password,
