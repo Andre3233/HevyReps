@@ -1,8 +1,9 @@
 import { createContext, useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
-
 import { jwtDecode } from "jwt-decode";
+import { BACKEND_URL } from "../api/config";
+import { refreshAccessToken as refreshAccessTokenApi } from "../api/AuthToken";
 import { loginUser } from "../api/loginUser";
 
 export const AuthContext = createContext();
@@ -33,7 +34,7 @@ export function AuthProvider({ children }) {
           scheduleTokenRefresh(Number(storedExpiration));
 
           // valida sessão em background (SEM bloquear app)
-          fetchWithAuth(`${BACKEND_URL}/protected`, {}, storedToken).catch(
+          fetchWithAuth(`${BACKEND_URL}/protected/`, {}, storedToken).catch(
             (e) => console.log("Erro ao validar sessão:", e.message),
           );
         }
@@ -84,26 +85,18 @@ export function AuthProvider({ children }) {
     const refreshToken = await SecureStore.getItemAsync("refreshToken");
     if (!refreshToken) throw new Error("Refresh token não encontrado");
 
-    const response = await fetch(`${BACKEND_URL}/refresh-token`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+    const data = await refreshAccessTokenApi(refreshToken);
 
-    if (!response.ok) throw new Error("Refresh token inválido");
-
-    const data = await response.json();
     await SecureStore.setItemAsync("userToken", data.access_token);
 
     const expiration = getTokenExpiration(data.access_token);
-
     setToken(data.access_token);
-
     setTokenExpiration(expiration);
-    await SecureStore.setItemAsync("tokenExpiration", String(expiration));
 
-    scheduleTokenRefresh(expiration);
-
+    if (expiration !== null) {
+      await SecureStore.setItemAsync("tokenExpiration", String(expiration));
+      scheduleTokenRefresh(expiration);
+    }
     return data.access_token;
   }
 
@@ -219,7 +212,6 @@ export function AuthProvider({ children }) {
     try {
       const data = await loginUser(identifier, password);
 
-      // adapta os nomes se forem diferentes na tua API
       const accessToken = data.access_token;
       const refreshToken = data.refresh_token;
       const user = data.user;

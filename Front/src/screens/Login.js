@@ -45,11 +45,7 @@ export default function Login() {
     try {
       const result = await loginUser(identifier, password);
       console.log("RESULT LOGIN:", result);
-      await signIn(
-        result.access_token,
-        result.user.refresh_token,
-        result.user.user,
-      );
+      await signIn(result.access_token, result.refresh_token, result.user);
     } catch (error) {
       setErrors({
         identifier: error?.detail || "Credenciais inválidas",

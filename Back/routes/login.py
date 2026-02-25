@@ -16,7 +16,7 @@ def login(user: userLogin):
     if "@" in identifier: #Procura user por email
         user_query = db.collection("users").where("email", "==", identifier).limit(1).get()
     else: #Procura user pelo username
-        user_query = db.collection("users").where("username", "==", identifier).get()
+        user_query = db.collection("users").where("username", "==", identifier).limit(1).get()
     if not user_query:
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
@@ -32,13 +32,13 @@ def login(user: userLogin):
         {"sub": user_in_db["username"]}, expires_delta = timedelta(days=90)
     )
 
-    return {"access_token": access_token, "token_type": "bearer", "user": {
-        "access_token": access_token,
+    return {
+        "access_token": access_token, 
         "refresh_token": refresh_token,
-        "token_type": "bearer",
+        "token_type": "bearer", 
         "user": {
             "username": user_in_db["username"],
             "email": user_in_db["email"],
             "profile_image_url": user_in_db.get("profile_image_url")
-        }
-    }}
+        },
+    }

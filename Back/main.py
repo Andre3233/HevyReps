@@ -6,12 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes.user import router as user_router 
 from core.firebase import initialize_firebase
 from routes.login import router as login_router
+from routes.auth import router as auth_router
+from routes.protected import router as protected_router
 
 app = FastAPI()
 
 origins = [
     "http://localhost:19006",
-    "*",
+    "http://192.168.1.70:19006",
 ]
 
 app.add_middleware(
@@ -25,7 +27,9 @@ app.add_middleware(
 initialize_firebase()
 
 app.include_router(user_router, prefix="/user", tags=["User"])
-app.include_router(login_router, prefix="/login", tags=["Login"])    
+app.include_router(login_router, prefix="/login", tags=["Login"])
+app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(protected_router, prefix="/protected", tags=["Protected"])
 
 @app.get("/")
 def root():

@@ -70,7 +70,6 @@ export default function UserRegister({ route }) {
         "As palavras-passe não coincidem. Tente novamente.";
     }
     setErrors(newErros);
-    console.log("Erro no registro: ", newErros);
 
     const hasError = Object.values(newErros).some((e) => e !== null);
     if (hasError) return; // Se ouver erro não envia nada para o BAck

@@ -1,10 +1,10 @@
 import { BACKEND_URL } from "./config";
 
-export async function registerUser(payload) {
-  const response = await fetch(`${BACKEND_URL}/user/register`, {
+export async function refreshAccessToken(refreshToken) {
+  const response = await fetch(`${BACKEND_URL}/auth/refresh-token`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ refresh_token: refreshToken }),
   });
 
   let data;
@@ -13,7 +13,7 @@ export async function registerUser(payload) {
   } catch {
     throw { detail: "Erro no servidor" };
   }
-  if (!response.ok) throw data;
 
+  if (!response.ok) throw data;
   return data;
 }
