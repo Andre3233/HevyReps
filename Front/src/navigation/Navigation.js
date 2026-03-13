@@ -3,10 +3,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import UserRegister from "../screens/UserRegister";
 import Login from "../screens/Login";
-import Profile from "../screens/Profile";
 import Defenitions from "../screens/Definitions";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
+import MainTabs from "./MainTabs";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,8 +19,8 @@ export function Navigation() {
         {signed ? (
           <>
             <Stack.Screen
-              name="Profile"
-              component={Profile}
+              name="MainTabs"
+              component={MainTabs}
               options={{ animation: "slide_from_right" }}
             />
             <Stack.Screen

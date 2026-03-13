@@ -108,3 +108,4 @@ firebase-debug.log*
 credentials
 firebase_service_account.json
 *.db
+exercises.json

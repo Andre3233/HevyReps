@@ -17,27 +17,46 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     async function loadStorageData() {
-      const storedExpiration =
-        await SecureStore.getItemAsync("tokenExpiration");
       try {
         const storedToken = await SecureStore.getItemAsync("userToken");
+        const storedRefresh = await SecureStore.getItemAsync("refreshToken");
         const storedUser = await AsyncStorage.getItem("@user");
+        const storedExpiration =
+          await SecureStore.getItemAsync("tokenExpiration");
 
-        if (storedExpiration && Date.now() >= Number(storedExpiration)) {
-          console.log("Token expirado, tentar refresh...");
-          await refreshAccessToken();
-        } else if (storedToken && storedUser && storedExpiration) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
-          setTokenExpiration(Number(storedExpiration));
+        if (!storedUser) return;
 
-          scheduleTokenRefresh(Number(storedExpiration));
+        //Restaura o user
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
 
-          // valida sessão em background (SEM bloquear app)
-          fetchWithAuth(`${BACKEND_URL}/protected/`, {}, storedToken).catch(
-            (e) => console.log("Erro ao validar sessão:", e.message),
-          );
+        const expirationMs = storedExpiration ? Number(storedExpiration) : null;
+
+        if (!storedToken || !expirationMs) {
+          if (storedRefresh) {
+            const newAccess = await refreshAccessToken();
+            setToken(newAccess);
+          } else {
+            //Se não houver refresh token
+            await signOut();
+          }
+          return;
         }
+
+        if (Date.now() >= expirationMs) {
+          console.log("Token expirado, tentar refresh");
+          const newAccess = await refreshAccessToken();
+          setToken(newAccess);
+          return;
+        }
+
+        setToken(storedToken);
+        setTokenExpiration(expirationMs);
+        scheduleTokenRefresh(expirationMs);
+
+        fetchWithAuth(`${BACKEND_URL}/protected/`, {}, storedToken).catch((e) =>
+          console.log("Erro ao validar sessão:", e.message),
+        );
       } catch (e) {
         console.log("Erro ao carregar sessão", e);
       } finally {
@@ -85,19 +104,26 @@ export function AuthProvider({ children }) {
     const refreshToken = await SecureStore.getItemAsync("refreshToken");
     if (!refreshToken) throw new Error("Refresh token não encontrado");
 
-    const data = await refreshAccessTokenApi(refreshToken);
+    try {
+      const data = await refreshAccessTokenApi(refreshToken);
 
-    await SecureStore.setItemAsync("userToken", data.access_token);
+      await SecureStore.setItemAsync("userToken", data.access_token);
 
-    const expiration = getTokenExpiration(data.access_token);
-    setToken(data.access_token);
-    setTokenExpiration(expiration);
+      const expiration = getTokenExpiration(data.access_token);
 
-    if (expiration !== null) {
-      await SecureStore.setItemAsync("tokenExpiration", String(expiration));
-      scheduleTokenRefresh(expiration);
+      setToken(data.access_token);
+      setTokenExpiration(expiration);
+
+      if (expiration !== null) {
+        await SecureStore.setItemAsync("tokenExpiration", String(expiration));
+        scheduleTokenRefresh(expiration);
+      }
+
+      return data.access_token;
+    } catch (e) {
+      await signOut();
+      throw e;
     }
-    return data.access_token;
   }
 
   async function fetchWithAuth(url, options = {}, forcedToken = null) {
@@ -163,6 +189,7 @@ export function AuthProvider({ children }) {
     // Limpa estado
     setUser(null);
     setToken(null);
+    setTokenExpiration(null);
 
     if (refreshTimer.current) {
       clearTimeout(refreshTimer.current);
@@ -233,6 +260,8 @@ export function AuthProvider({ children }) {
         login,
         signIn,
         signOut,
+        fetchWithAuth,
+        refreshAccessToken,
       }}
     >
       {children}

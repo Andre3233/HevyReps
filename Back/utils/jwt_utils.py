@@ -25,7 +25,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 def create_refresh_token(data: dict, expires_delta=None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta if expires_delta else timedelta(days=30))
+    expire = datetime.utcnow() + (expires_delta if expires_delta else timedelta(days=90))
     to_encode.update({"exp": expire, "type": "refresh"})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -41,7 +41,7 @@ def verify_access_token(token: str):
                 detail="Tipo de token invalido"
             )
 
-        username: str | None=payload.get("sub")
+        username = payload.get("sub")
 
         if username is None:
             raise HTTPException(
@@ -57,5 +57,5 @@ def verify_access_token(token: str):
         )
     # No futuro, invalidar tokens quando:
     # - password for alterada
-    # - conta for banida ou apagada
+    # - conta for apagada
     # Estratégia ainda por definir (expiração ou validação na BD)

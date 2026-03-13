@@ -6,4 +6,5 @@ export const colors = {
     text: '#ffffff',
     textSecondary: '#94a3b8',
     disable: '#334155',
+    tabBar: "#1E1E1E",
 };

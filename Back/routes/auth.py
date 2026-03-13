@@ -28,6 +28,5 @@ def refresh_token_endpoint(body: RefreshRequest):
 
     new_access_token = create_access_token(
         {"sub": username},
-        expires_delta=timedelta(hours=1)
     )
     return {"access_token": new_access_token, "token_type": "bearer"}

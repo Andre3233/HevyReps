@@ -23,9 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "CAMERA"
-      ],
+      "permissions": ["CAMERA"],
       "permissionPrompt": {
         "camera": "A aplicação precisa de acesso à câmara para tirares a tua foto de perfil."
       },
@@ -34,8 +32,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-secure-store"
-    ]
+    "plugins": ["expo-secure-store"]
   }
 }

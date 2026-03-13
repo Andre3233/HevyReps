@@ -26,7 +26,7 @@ def login(user: userLogin):
     
     #Atribuição tokens
     access_token = create_access_token(
-        {"sub": user_in_db["username"]}, expires_delta = timedelta(hours=5)
+        {"sub": user_in_db["username"]}, expires_delta = timedelta(minutes=15)
     )
     refresh_token = create_refresh_token(
         {"sub": user_in_db["username"]}, expires_delta = timedelta(days=90)
