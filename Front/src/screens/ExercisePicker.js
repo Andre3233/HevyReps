@@ -136,11 +136,6 @@ export default function ExercisePicker() {
     loadExercises({ reset: true, currentSeartch: search });
   }
 
-  function clearSearch() {
-    setSearch("");
-    loadExercises({ reset: true, currentSeartch: "" });
-  }
-
   function isSelected(exerciseId) {
     return !!selectedMap[exerciseId];
   }

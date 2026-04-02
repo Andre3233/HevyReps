@@ -246,4 +246,9 @@ export const styles = StyleSheet.create({
     fontSize: RFValue(16),
     fontWeight: "800",
   },
+
+  exerciseItemWrapperActive: {
+    elevation: 10,
+    zIndex: 10,
+  },
 });

@@ -12,7 +12,7 @@ class ExerciseListItem(BaseModel):
 class ExerciseDetail(ExerciseListItem):
     instructions: List[str] = Field(default_factory=list)
     equipment: Optional[str] = None
-    body_part: Optional[str] = None #Parte do corpo trabalhada
+    body_part: Optional[str] = None 
     
 class ExerciseListResponse(BaseModel):
     items: List[ExerciseListItem]

@@ -34,3 +34,8 @@ export async function listExercises({search = "", limit=30, offset=0,} = {}) {
 
     return await exerciseResponse(response)
 }
+
+export async function getExercise(fetchWithAuth, exerciseId) {
+  const response = await fetchWithAuth(`${BACKEND_URL}/exercises/${exerciseId}`, {method: "GET",})
+  return await exerciseResponse(response)
+}

@@ -6,14 +6,13 @@ import {
   TouchableOpacity,
   View,
   Alert,
-  Pressable,
 } from "react-native";
 import { useState, useContext, useCallback } from "react";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { styles } from "../styles/Workouts.style";
 import { AuthContext } from "../context/AuthContext";
 import { listWorkouts, deleteWorkout } from "../api/workouts";
+import DropdownMenu from "../components/DropdownMenu";
 
 function formatRelativeTime(dateString) {
   if (!dateString) return "Sem data";
@@ -182,21 +181,25 @@ export default function Workouts() {
           </TouchableOpacity>
         </View>
       ) : (
-        <>
+        <View style={{ flex: 1 }}>
           <FlatList
             data={workouts}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            onScrollBeginDrag={() => setOpenMenuWorkoutId(null)}
             renderItem={({ item }) => {
               const isMenuOpen = openMenuWorkoutId === item.id;
               const isDeleting = deletingWorkoutId === item.id;
 
               return (
                 <TouchableOpacity
-                  style={styles.card}
+                  style={[styles.card, isMenuOpen && styles.cardActive]}
                   activeOpacity={0.85}
-                  onPress={() => openEdit(item)}
+                  onPress={() => {
+                    setOpenMenuWorkoutId(null);
+                    openEdit(item);
+                  }}
                 >
                   <View style={styles.cardHeaderRow}>
                     <Text style={styles.cardTitle} numberOfLines={1}>
@@ -204,45 +207,12 @@ export default function Workouts() {
                     </Text>
 
                     <View style={styles.menuWrapper}>
-                      <TouchableOpacity
-                        onPress={() => toggleWorkoutMenu(item.id)}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                      >
-                        <MaterialIcons
-                          name="more-vert"
-                          size={22}
-                          color="#ffff"
-                        />
-                      </TouchableOpacity>
-
-                      {isMenuOpen && (
-                        <>
-                          <Pressable
-                            style={styles.menuOverlay}
-                            onPress={() => setOpenMenuWorkoutId(null)}
-                          />
-
-                          <View style={styles.workoutMenu}>
-                            <TouchableOpacity
-                              style={styles.workoutMenuDeleteBtn}
-                              onPress={() => confirmDeleteWorkout(item.id)}
-                              disabled={isDeleting}
-                              activeOpacity={0.85}
-                            >
-                              <View style={styles.deleteRow}>
-                                <MaterialIcons
-                                  name="delete-outline"
-                                  size={18}
-                                  color="#ff4d4f"
-                                />
-                                <Text style={styles.workoutMenuDeleteText}>
-                                  {isDeleting ? "A apagar..." : "Apagar treino"}
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
-                          </View>
-                        </>
-                      )}
+                      <DropdownMenu
+                        isOpen={isMenuOpen}
+                        onToggle={() => toggleWorkoutMenu(item.id)}
+                        onDelete={() => confirmDeleteWorkout(item.id)}
+                        deleteLabel="Apagar treino"
+                      />
                     </View>
                   </View>
 
@@ -260,16 +230,15 @@ export default function Workouts() {
               );
             }}
           />
-
-          <TouchableOpacity
-            style={styles.fab}
-            onPress={openCreate}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.fabText}>+</Text>
-          </TouchableOpacity>
-        </>
+        </View>
       )}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={openCreate}
+        activeOpacity={0.85}
+      >
+        <Text style={styles.fabText}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -65,12 +65,31 @@ export const styles = StyleSheet.create({
     paddingBottom: RFValue(100),
   },
 
+  // Overlay com zIndex BAIXO (1) — fica atrás do listContainer (zIndex 2).
+  // Apanha toques nos espaços vazios fora dos cards para fechar o menu.
+  menuOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
+  },
+
+  // Contentor do FlatList com zIndex ALTO (2) — garante que todos os cards
+  // ficam acima da overlay, logo os toques chegam sempre aos cards normalmente.
+  listContainer: {
+    flex: 1,
+    zIndex: 2,
+  },
+
   card: {
     borderRadius: RFValue(16),
     padding: RFValue(14),
     marginBottom: RFValue(12),
     backgroundColor: colors.cardBackground,
     position: "relative",
+    overflow: "visible",
   },
 
   cardTop: {
@@ -79,11 +98,14 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  // zIndex: 1 coloca este row (e o menu absoluto dentro dele) acima do
+  // cardMetaRow que vem depois no JSX e que, sem isso, o sobrepunha visualmente.
   cardHeaderRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     marginBottom: RFValue(8),
+    zIndex: 1,
   },
 
   cardTitle: {
@@ -104,6 +126,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    zIndex: 0,
   },
 
   cardSub: {
@@ -168,8 +191,8 @@ export const styles = StyleSheet.create({
     gap: RFValue(8),
   },
 
-  menuOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 5,
+  cardActive: {
+    elevation: 10,
+    zIndex: 10,
   },
 });

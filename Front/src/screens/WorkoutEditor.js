@@ -18,6 +18,8 @@ import { styles } from "../styles/WorkoutEditor.style";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../context/AuthContext";
 import { createWorkout, updateWorkout } from "../api/workouts";
+import DropdownMenu from "../components/DropdownMenu";
+import { getExercise } from "../api/exercises";
 
 export default function WorkoutEditor() {
   const navigation = useNavigation();
@@ -42,19 +44,33 @@ export default function WorkoutEditor() {
   const screenTitle = mode === "edit" ? "Editar treino" : "Novo treino";
 
   useEffect(() => {
-    if (mode === "edit" && workout) {
+    console.log("modo:", mode, "workout:", workout);
+    if (mode === "edit" && workout) setName(workout.name || "");
+    if (mode === "edit" && workout && selectedExercises === null) {
       setIsEditingName(false);
-      setName(workout.name || "");
-      setExercises(
-        (workout.exerciseIds || []).map((id) => ({
-          id,
-          name: id,
-        })),
-      );
+      async function mapExercises() {
+        try {
+          const result = await Promise.all(
+            workout.exerciseIds.map((id) => getExercise(fetchWithAuth, id)),
+          );
+          console.log("mapExercises result:", result);
+          setExercises(result);
+        } catch (error) {
+          console.log("Erro no mapExercises:", error);
+        }
+      }
+      mapExercises();
     }
+    console.log(selectedExercises);
+    console.log("route.params:", route.params);
   }, [mode, workout]);
 
   useEffect(() => {
+    console.log("segundo useEffect disparou:", selectedExercises);
+
+    if (mode === "create" && workoutName) {
+      setName(workoutName);
+    }
     if (selectedExercises && Array.isArray(selectedExercises)) {
       setExercises(selectedExercises);
     }
@@ -190,7 +206,12 @@ export default function WorkoutEditor() {
               const isMenuOpen = openMenuExerciseId === item.id;
 
               return (
-                <View style={styles.exerciseItemWrapper}>
+                <View
+                  style={[
+                    styles.exerciseItemWrapper,
+                    isMenuOpen && styles.exerciseItemWrapperActive,
+                  ]}
+                >
                   <View style={styles.exerciseItem}>
                     <View style={styles.exerciseLeft}>
                       <View style={styles.exerciseInfo}>
@@ -199,44 +220,12 @@ export default function WorkoutEditor() {
                     </View>
 
                     <View style={styles.menuWrapper}>
-                      <TouchableOpacity
-                        onPress={() => toggleExerciseMenu(item.id)}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                      >
-                        <MaterialIcons
-                          name="more-vert"
-                          size={22}
-                          color="#ffff"
-                        />
-                      </TouchableOpacity>
-
-                      {isMenuOpen && (
-                        <>
-                          <Pressable
-                            style={styles.menuOverlay}
-                            onPress={() => setOpenMenuExerciseId(null)}
-                          />
-
-                          <View style={styles.workoutMenu}>
-                            <TouchableOpacity
-                              style={styles.workoutMenuDeleteBtn}
-                              onPress={() => removeExercise(item.id)}
-                              activeOpacity={0.85}
-                            >
-                              <View style={styles.deleteRow}>
-                                <MaterialIcons
-                                  name="delete-outline"
-                                  size={18}
-                                  color="#ff4d4f"
-                                />
-                                <Text style={styles.workoutMenuDeleteText}>
-                                  Apagar exercício
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
-                          </View>
-                        </>
-                      )}
+                      <DropdownMenu
+                        isOpen={isMenuOpen}
+                        onToggle={() => toggleExerciseMenu(item.id)}
+                        onDelete={() => removeExercise(item.id)}
+                        deleteLabel="Apagar exercício"
+                      />
                     </View>
                   </View>
                 </View>
