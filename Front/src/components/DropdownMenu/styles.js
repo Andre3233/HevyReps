@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     paddingVertical: RFValue(6),
     minWidth: RFValue(160),
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "#2a3a4f",
     zIndex: 10,
     elevation: 8,
   },

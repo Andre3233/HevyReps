@@ -141,20 +141,6 @@ export const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
 
-  workoutMenu: {
-    position: "absolute",
-    top: RFValue(28),
-    right: 0,
-    backgroundColor: colors.cardBackground,
-    borderRadius: RFValue(12),
-    paddingVertical: RFValue(6),
-    minWidth: RFValue(160),
-    borderWidth: 1,
-    borderColor: colors.border,
-    zIndex: 10,
-    elevation: 8,
-  },
-
   workoutMenuDeleteBtn: {
     paddingVertical: RFValue(10),
     paddingHorizontal: RFValue(14),

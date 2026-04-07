@@ -13,8 +13,6 @@ import { PasswordInput, IdentifierInput } from "../components/Input";
 import { ImgDefault } from "../components/ImgProfile";
 import { Button, LinkButton } from "../components/Button";
 import { useNavigation } from "@react-navigation/native";
-import { loginUser } from "../api/loginUser";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Login() {
@@ -25,7 +23,7 @@ export default function Login() {
   const [errors, setErrors] = useState({ identifier: null, password: null });
   const [loading, setLoading] = useState(false);
 
-  const { signIn } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   async function handleLogin() {
     //Validação simples antees de enviar para o Back
@@ -43,9 +41,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const result = await loginUser(identifier, password);
-      console.log("RESULT LOGIN:", result);
-      await signIn(result.access_token, result.refresh_token, result.user);
+      await login(identifier, password);
     } catch (error) {
       setErrors({
         identifier: error?.detail || "Credenciais inválidas",

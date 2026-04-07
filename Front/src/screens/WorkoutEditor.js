@@ -44,7 +44,6 @@ export default function WorkoutEditor() {
   const screenTitle = mode === "edit" ? "Editar treino" : "Novo treino";
 
   useEffect(() => {
-    console.log("modo:", mode, "workout:", workout);
     if (mode === "edit" && workout) setName(workout.name || "");
     if (mode === "edit" && workout && selectedExercises === null) {
       setIsEditingName(false);
@@ -53,21 +52,14 @@ export default function WorkoutEditor() {
           const result = await Promise.all(
             workout.exerciseIds.map((id) => getExercise(fetchWithAuth, id)),
           );
-          console.log("mapExercises result:", result);
           setExercises(result);
-        } catch (error) {
-          console.log("Erro no mapExercises:", error);
-        }
+        } catch (error) {}
       }
       mapExercises();
     }
-    console.log(selectedExercises);
-    console.log("route.params:", route.params);
   }, [mode, workout]);
 
   useEffect(() => {
-    console.log("segundo useEffect disparou:", selectedExercises);
-
     if (mode === "create" && workoutName) {
       setName(workoutName);
     }

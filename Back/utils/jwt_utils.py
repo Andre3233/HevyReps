@@ -3,7 +3,7 @@ from jose import jwt, JWTError
 from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import HTTPException, status
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 load_dotenv()
 
@@ -15,9 +15,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login/login")
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -25,7 +25,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 def create_refresh_token(data: dict, expires_delta=None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta if expires_delta else timedelta(days=90))
+    expire = datetime.now(timezone.utc) + (expires_delta if expires_delta else timedelta(days=90))
     to_encode.update({"exp": expire, "type": "refresh"})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

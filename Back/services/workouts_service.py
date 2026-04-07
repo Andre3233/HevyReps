@@ -12,12 +12,11 @@ def _normalize_name(name: str) -> str:
     return " ".join(name.strip().split())
 
 def _normalize_exercise_ids(exercise_ids: Optional[List[Any]]) -> List[str]:
-    #Garante que exercise_ids é uma lista de strings e Remove ids vazios e duplicados mantendo a ordem.
+    #Garante que exercise_ids é uma lista de strings e Remove ids vazios.
     if not exercise_ids:
         return []
     
     cleaned: List[str] = []
-    seen = set()
     
     for x in exercise_ids:
         if x is None:
@@ -25,9 +24,6 @@ def _normalize_exercise_ids(exercise_ids: Optional[List[Any]]) -> List[str]:
         s = str(x).strip()
         if not s:
             continue
-        if s in seen:
-            continue
-        seen.add(s)
         cleaned.append(s)
         
     return cleaned

@@ -8,8 +8,15 @@ from routes.exercises import router as exercises_router
 from core.firebase import initialize_firebase
 from services.exercise_dataset import ensure_dataset
 from routes.workouts import router as workouts
-
-app = FastAPI()
+from contextlib import asynccontextmanager
+ 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    initialize_firebase()
+    ensure_dataset()
+    yield
+    
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:19006",
@@ -23,12 +30,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-initialize_firebase()
-
-@app.on_event("startup")
-def startup_event():
-    ensure_dataset()
 
 app.include_router(user_router, prefix="/user", tags=["User"])
 app.include_router(login_router, prefix="/login", tags=["Login"])

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from models.user_model import UserCreate 
 from utils.security import hash_password # Função do hasher da pass
-from core.firebase_utils import create_user
+from services.user_service import create_user
 
 router = APIRouter() #Server modular
 
