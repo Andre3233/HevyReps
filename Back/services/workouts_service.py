@@ -11,23 +11,6 @@ def _workouts_collection(db): #Atalho para a coleção treinos
 def _normalize_name(name: str) -> str:
     return " ".join(name.strip().split())
 
-def _normalize_exercise_ids(exercise_ids: Optional[List[Any]]) -> List[str]:
-    #Garante que exercise_ids é uma lista de strings e Remove ids vazios.
-    if not exercise_ids:
-        return []
-    
-    cleaned: List[str] = []
-    
-    for x in exercise_ids:
-        if x is None:
-            continue
-        s = str(x).strip()
-        if not s:
-            continue
-        cleaned.append(s)
-        
-    return cleaned
-
 def _doc_to_workout(doc) -> Dict[str, Any]:
     #Converte um DocumentSnapshot do Firestore num dict com id incluído.
     data = doc.to_dict() or {}
@@ -43,15 +26,15 @@ def create_workout(db, owner_username: str, data: Dict[str, Any]) -> Dict[str, A
     if not name:
         raise ValueError("Nome do treino é obrigatorio")
     
-    exercise_ids = _normalize_exercise_ids(data.get("exercise_ids"))
+    exercises = data.get("exercises") or []
     
     now = now_iso()
     
     payload = {
         "owner_username": owner_username,
         "name": name,
-        "exercise_ids": exercise_ids, #lista de ids do dataset
-        "exercise_count": len(exercise_ids),
+        "exercises": exercises, #lista de objetos com id, nome e sets
+        "exercise_count": len(exercises),
         "created_at": now,
         "updated_at": now,
     }
@@ -69,6 +52,7 @@ def list_workouts(db, owner_username: str, limit: int = 50) -> List[Dict[str, An
     if not owner_username or not str(owner_username).strip():
         raise ValueError("owner_username inválido")
     
+    #Limita o número de treinos retornados para evitar sobrecarregar o cliente e o servidor
     if limit < 1:
         limit = 1
     if limit > 100:
@@ -104,7 +88,7 @@ def _get_workout(db, owner_username: str, workout_id: str) -> Optional[Dict[str,
     return data
 
 def update_workout(db, owner_username: str, workout_id: str, data: Dict[str,Any]) -> Optional[Dict[str, Any]]:
-    #Atualiza nome e exercise_ids
+    #Atualiza nome e lista de exercícios
     
     current = _get_workout(db, owner_username, workout_id)
     if current is None:
@@ -112,17 +96,16 @@ def update_workout(db, owner_username: str, workout_id: str, data: Dict[str,Any]
     
     updates: Dict[str, Any] = {}
     
-    
     if "name" in data:
         new_name = _normalize_name(str(data.get("name", "")))
         if not new_name:
             raise ValueError("Nome do treino não pode ficar vazio")
         updates["name"] = new_name
 
-    if "exercise_ids" in data:
-        normalized_ids = _normalize_exercise_ids(data.get("exercise_ids"))
-        updates["exercise_ids"] = normalized_ids
-        updates["exercise_count"] = len(normalized_ids)
+    if "exercises" in data:
+        exercises = data.get("exercises") or []
+        updates["exercises"] = exercises
+        updates["exercise_count"] = len(exercises)
 
     if not updates:
         return current

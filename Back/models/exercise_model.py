@@ -17,3 +17,4 @@ class ExerciseDetail(ExerciseListItem):
 class ExerciseListResponse(BaseModel):
     items: List[ExerciseListItem]
     total: int = 0
+    

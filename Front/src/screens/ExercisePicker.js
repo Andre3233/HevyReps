@@ -128,8 +128,17 @@ export default function ExercisePicker() {
     });
   }
 
-  function handleConirm() {
-    navigation.navigate("WorkoutEditor", { selectedExercises, workoutName, mode, workout });
+  function handleConfirm() {
+    navigation.navigate("WorkoutEditor", {
+      workoutName,
+      mode,
+      workout,
+      selectedExercises: selectedExercises.map((e) => ({
+        id: e.id,
+        name: e.name,
+        exercise_sets: e.exercise_sets || [],
+      })),
+    });
   }
 
   function searchSubmit() {
@@ -154,7 +163,7 @@ export default function ExercisePicker() {
           <Text style={styles.headerTitle}>Exercícios</Text>
 
           <TouchableOpacity
-            onPress={handleConirm}
+            onPress={handleConfirm}
             hitSlop={10}
             style={styles.headerBtn}
           >

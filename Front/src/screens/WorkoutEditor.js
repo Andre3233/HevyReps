@@ -19,7 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../context/AuthContext";
 import { createWorkout, updateWorkout } from "../api/workouts";
 import DropdownMenu from "../components/DropdownMenu";
-import { getExercise } from "../api/exercises";
+import ExerciseCard from "../components/ExerciseCard";
 
 export default function WorkoutEditor() {
   const navigation = useNavigation();
@@ -47,15 +47,7 @@ export default function WorkoutEditor() {
     if (mode === "edit" && workout) setName(workout.name || "");
     if (mode === "edit" && workout && selectedExercises === null) {
       setIsEditingName(false);
-      async function mapExercises() {
-        try {
-          const result = await Promise.all(
-            workout.exerciseIds.map((id) => getExercise(fetchWithAuth, id)),
-          );
-          setExercises(result);
-        } catch (error) {}
-      }
-      mapExercises();
+      setExercises(workout.exercises || []);
     }
   }, [mode, workout]);
 
@@ -108,7 +100,11 @@ export default function WorkoutEditor() {
 
     const payload = {
       name: name.trim(),
-      exercise_ids: exercises.map((e) => e.id),
+      exercises: exercises.map((e) => ({
+        id: e.id,
+        name: e.name,
+        exercise_sets: e.exercise_sets,
+      })),
     };
 
     try {
@@ -132,11 +128,57 @@ export default function WorkoutEditor() {
     }
   }
 
+  function handleAddSet(exerciseId) {
+    setExercises((ex) =>
+      ex.map((e) =>
+        e.id === exerciseId
+          ? {
+              ...e,
+              exercise_sets: [
+                ...(e.exercise_sets || []),
+                { repetitions: 0, weight: 0 },
+              ],
+            }
+          : e,
+      ),
+    );
+  }
+
+  function handleEditSet(exerciseId, setIndex, field, value) {
+    setExercises((ex) =>
+      ex.map((e) =>
+        e.id === exerciseId
+          ? {
+              ...e,
+              exercise_sets: (e.exercise_sets || []).map((set, i) =>
+                i === setIndex ? { ...set, [field]: value } : set,
+              ),
+            }
+          : e,
+      ),
+    );
+  }
+
+  function handleRemoveSet(exerciseId, setIndex) {
+    setExercises((ex) =>
+      ex.map((e) =>
+        e.id === exerciseId
+          ? {
+              ...e,
+              exercise_sets: (e.exercise_sets || []).filter(
+                (set, i) => i !== setIndex,
+              ),
+            }
+          : e,
+      ),
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : "padding"}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <View style={styles.header}>
@@ -220,6 +262,16 @@ export default function WorkoutEditor() {
                       />
                     </View>
                   </View>
+                  <ExerciseCard
+                    exercise_sets={item.exercise_sets}
+                    onAddSet={() => handleAddSet(item.id)}
+                    onEditSet={(setIndex, field, value) =>
+                      handleEditSet(item.id, setIndex, field, value)
+                    }
+                    onDeleteSet={(setIndex) =>
+                      handleRemoveSet(item.id, setIndex)
+                    }
+                  />
                 </View>
               );
             }}

@@ -102,12 +102,12 @@ export const styles = StyleSheet.create({
     position: "relative",
     marginBottom: RFValue(10),
     zIndex: 1,
-  },
-
-  exerciseItem: {
     backgroundColor: colors.cardBackground,
     borderRadius: RFValue(14),
     padding: RFValue(12),
+  },
+
+  exerciseItem: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -148,7 +148,6 @@ export const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-end",
   },
-
 
   workoutMenuDeleteBtn: {
     paddingVertical: RFValue(10),

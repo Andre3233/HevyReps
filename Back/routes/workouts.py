@@ -8,7 +8,7 @@ router = APIRouter()
 
 @router.post("/", response_model=WorkoutDetail, status_code=status.HTTP_201_CREATED)
 def create_workout_route( payload: WorkoutCreate, token: str = Depends(oauth2_scheme),): 
-    #Cria um treino novo para o user autenticado
+    #Cria um treino novo para um user autenticado
     owner_username = verify_access_token(token)
     db = get_db()
     

@@ -93,7 +93,7 @@ export default function Workouts() {
         name: item.name,
         exerciseCount: item.exercise_count ?? 0,
         updatedAt: item.updated_at ?? null,
-        exerciseIds: item.exercise_ids ?? [],
+        exercises: item.exercises ?? [],
         createdAt: item.created_at ?? null,
       }));
 
