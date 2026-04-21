@@ -149,6 +149,10 @@ export default function ExercisePicker() {
     return !!selectedMap[exerciseId];
   }
 
+  function handleExerciseInfo(exerciseId, name) {
+    navigation.navigate("ExerciseInfo", { id: exerciseId, name });
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <KeyboardAvoidingView
@@ -227,9 +231,14 @@ export default function ExercisePicker() {
                     activeOpacity={0.85}
                   >
                     <View style={styles.cardLeft}>
-                      <Text style={styles.cardTitle}>{item.name}</Text>
+                      <TouchableOpacity
+                        onPress={() => handleExerciseInfo(item.id, item.name)}
+                      >
+                        <Text style={styles.cardTitle}>{item.name}</Text>
+                      </TouchableOpacity>
+
                       <Text style={styles.cardSub}>
-                        {item.primary_muscle || "Sem múscuko principal"}
+                        {item.primary_muscle || "Sem músculo principal"}
                       </Text>
                     </View>
 

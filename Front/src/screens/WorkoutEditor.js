@@ -74,7 +74,7 @@ export default function WorkoutEditor() {
     Keyboard.dismiss();
   }
 
-  function toggleExerciseMenu(exerciseId) {
+  function toggleExerciseMenu(exerciseId, exerciseName) {
     setOpenMenuExerciseId((prev) => (prev === exerciseId ? null : exerciseId));
   }
 
@@ -174,6 +174,10 @@ export default function WorkoutEditor() {
     );
   }
 
+  function handleExerciseInfo(exerciseId, name) {
+    navigation.navigate("ExerciseInfo", { id: exerciseId, name});
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <KeyboardAvoidingView
@@ -249,7 +253,11 @@ export default function WorkoutEditor() {
                   <View style={styles.exerciseItem}>
                     <View style={styles.exerciseLeft}>
                       <View style={styles.exerciseInfo}>
-                        <Text style={styles.exerciseName}>{item.name}</Text>
+                        <TouchableOpacity
+                          onPress={() => handleExerciseInfo(item.id, item.name)}
+                        >
+                          <Text style={styles.exerciseName}>{item.name}</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
 
