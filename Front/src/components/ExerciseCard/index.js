@@ -8,25 +8,49 @@ import {
 } from "react-native";
 import { styles } from "./style";
 import { colors } from "../../styles/colors";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export default function ExerciseCard({
   exercise_sets,
   onAddSet,
-  onEditSet,
+  onUpdateSet,
   onDeleteSet,
+  mode = "editor",
+  onToggleComplete,
 }) {
   const [setModal, setSetModal] = useState({ visible: false, setIndex: null });
+  const [localSets, setLocalSets] = useState(exercise_sets || []);
+
+  useEffect(() => {
+    setLocalSets(exercise_sets || []);
+  }, [exercise_sets]);
+
+  function handleChangeText(index, field, value) {
+    const updated = localSets.map((set, i) =>
+      i === index ? { ...set, [field]: value } : set,
+    );
+    setLocalSets(updated);
+  }
+
+  function handleBlur(index, field) {
+    const value = localSets[index][field];
+    const numValue = parseFloat(value);
+
+    if (!isNaN(numValue)) {
+      onUpdateSet(index, { [field]: numValue });
+    }
+  }
 
   function handleCloseModal() {
     setSetModal({ visible: false, setIndex: null });
   }
+
   return (
     <View>
-      <View style={styles.info}>
-        {(exercise_sets || []).map((exercise_set, index) => (
+      <View>
+        {localSets.map((set, index) => (
           <View key={index} style={styles.exerciseSets}>
             <View style={styles.column}>
               <Text style={styles.columnLabel}>Série</Text>
@@ -48,15 +72,14 @@ export default function ExerciseCard({
               <Text style={styles.columnLabel}>Repetições</Text>
               <TextInput
                 style={styles.textInput}
-                value={
-                  exercise_set.repetitions === 0
-                    ? ""
-                    : String(exercise_set.repetitions)
-                }
+                value={set.repetitions != null ? String(set.repetitions) : ""}
                 placeholder="0"
                 placeholderTextColor={colors.textSecondary}
                 keyboardType="numeric"
-                onChangeText={(value) => onEditSet(index, "repetitions", value)}
+                onChangeText={(value) =>
+                  handleChangeText(index, "repetitions", value)
+                }
+                onBlur={() => handleBlur(index, "repetitions")}
               />
             </View>
 
@@ -64,15 +87,31 @@ export default function ExerciseCard({
               <Text style={styles.columnLabel}>Kg</Text>
               <TextInput
                 style={styles.textInput}
-                value={
-                  exercise_set.weight === 0 ? "" : String(exercise_set.weight)
-                }
+                value={set.weight != null ? String(set.weight) : ""}
                 placeholder="0"
                 placeholderTextColor={colors.textSecondary}
                 keyboardType="numeric"
-                onChangeText={(value) => onEditSet(index, "weight", value)}
+                onChangeText={(value) =>
+                  handleChangeText(index, "weight", value)
+                }
+                onBlur={() => handleBlur(index, "weight")}
               />
             </View>
+
+            {mode === "session" && (
+              <View style={styles.column}>
+                <Text style={styles.columnLabel}>✓</Text>
+                <TouchableOpacity onPress={() => onToggleComplete(index)}>
+                  <MaterialIcons
+                    name={
+                      set.completed ? "check-box" : "check-box-outline-blank"
+                    }
+                    size={24}
+                    color={set.completed ? "#4ade80" : "#888"}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         ))}
         <TouchableOpacity onPress={onAddSet} style={styles.addBtn}>
@@ -87,7 +126,6 @@ export default function ExerciseCard({
             onPress={(e) => e.stopPropagation()}
           >
             <Text style={styles.modalTitle}>Opções da série</Text>
-
             <TouchableOpacity
               style={styles.modalDeleteBtn}
               onPress={() => {
@@ -102,7 +140,6 @@ export default function ExerciseCard({
                 </Text>
               </View>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={styles.modalCancelBtn}
               onPress={handleCloseModal}

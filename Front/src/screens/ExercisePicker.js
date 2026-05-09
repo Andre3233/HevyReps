@@ -129,16 +129,27 @@ export default function ExercisePicker() {
   }
 
   function handleConfirm() {
-    navigation.navigate("WorkoutEditor", {
-      workoutName,
-      mode,
-      workout,
-      selectedExercises: selectedExercises.map((e) => ({
-        id: e.id,
-        name: e.name,
-        exercise_sets: e.exercise_sets || [],
-      })),
-    });
+    mode == "edit" || mode == "create"
+      ? navigation.navigate("WorkoutEditor", {
+          workoutName,
+          mode,
+          workout,
+          selectedExercises: selectedExercises.map((e) => ({
+            id: e.id,
+            name: e.name,
+            exercise_sets: e.exercise_sets || [],
+          })),
+        })
+      : navigation.navigate("WorkoutSession", {
+          workoutName,
+          mode,
+          workout,
+          selectedExercises: selectedExercises.map((e) => ({
+            id: e.id,
+            name: e.name, 
+            exercise_sets: e.exercise_sets || [],
+          })),
+        });
   }
 
   function searchSubmit() {

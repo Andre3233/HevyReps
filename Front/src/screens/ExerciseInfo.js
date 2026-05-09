@@ -99,7 +99,7 @@ export default function ExerciseInfo() {
               />
             ))}
           </ScrollView>
-          <View style={{ position: "absolute", top: 210, right: 15 }}>
+          <View style={{ position: "absolute", top: 240, right: 15 }}>
             <Text style={styles.text}>
               {imageIndex + 1}/{exerciseData?.frames.length}
             </Text>

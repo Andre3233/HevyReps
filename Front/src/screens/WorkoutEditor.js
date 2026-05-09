@@ -18,7 +18,7 @@ import { styles } from "../styles/WorkoutEditor.style";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../context/AuthContext";
 import { createWorkout, updateWorkout } from "../api/workouts";
-import DropdownMenu from "../components/DropdownMenu";
+import { DropdownMenuWorkouts } from "../components/DropdownMenu";
 import ExerciseCard from "../components/ExerciseCard";
 
 export default function WorkoutEditor() {
@@ -175,7 +175,7 @@ export default function WorkoutEditor() {
   }
 
   function handleExerciseInfo(exerciseId, name) {
-    navigation.navigate("ExerciseInfo", { id: exerciseId, name});
+    navigation.navigate("ExerciseInfo", { id: exerciseId, name });
   }
 
   return (
@@ -186,7 +186,10 @@ export default function WorkoutEditor() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <View style={styles.header}>
-          <Pressable onPress={goBack} hitSlop={10}>
+          <Pressable
+            onPress={() => navigation.navigate("Workouts")}
+            hitSlop={10}
+          >
             <Text style={styles.headerBtnText}>Voltar</Text>
           </Pressable>
 
@@ -262,7 +265,7 @@ export default function WorkoutEditor() {
                     </View>
 
                     <View style={styles.menuWrapper}>
-                      <DropdownMenu
+                      <DropdownMenuWorkouts
                         isOpen={isMenuOpen}
                         onToggle={() => toggleExerciseMenu(item.id)}
                         onDelete={() => removeExercise(item.id)}

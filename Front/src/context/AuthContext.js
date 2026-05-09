@@ -186,6 +186,8 @@ export function AuthProvider({ children }) {
     await SecureStore.deleteItemAsync("tokenExpiration");
     await AsyncStorage.removeItem("@user");
 
+    await AsyncStorage.removeItem("@activeWorkout");
+
     // Limpa estado
     setUser(null);
     setToken(null);

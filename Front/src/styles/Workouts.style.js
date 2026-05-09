@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { colors } from "./colors";
 
@@ -65,8 +65,6 @@ export const styles = StyleSheet.create({
     paddingBottom: RFValue(100),
   },
 
-  // Overlay com zIndex BAIXO (1) — fica atrás do listContainer (zIndex 2).
-  // Apanha toques nos espaços vazios fora dos cards para fechar o menu.
   menuOverlay: {
     position: "absolute",
     top: 0,
@@ -76,8 +74,6 @@ export const styles = StyleSheet.create({
     zIndex: 1,
   },
 
-  // Contentor do FlatList com zIndex ALTO (2) — garante que todos os cards
-  // ficam acima da overlay, logo os toques chegam sempre aos cards normalmente.
   listContainer: {
     flex: 1,
     zIndex: 2,
@@ -90,6 +86,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.cardBackground,
     position: "relative",
     overflow: "visible",
+    zIndex: 0,
   },
 
   cardTop: {
@@ -98,14 +95,12 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  // zIndex: 1 coloca este row (e o menu absoluto dentro dele) acima do
-  // cardMetaRow que vem depois no JSX e que, sem isso, o sobrepunha visualmente.
   cardHeaderRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     marginBottom: RFValue(8),
-    zIndex: 1,
+    zIndex: 9999,
   },
 
   cardTitle: {
@@ -139,6 +134,7 @@ export const styles = StyleSheet.create({
     position: "relative",
     justifyContent: "flex-start",
     alignItems: "flex-end",
+    zIndex: 9999,
   },
 
   workoutMenuDeleteBtn: {
@@ -162,6 +158,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.buttonBackground,
+    zIndex: 100,
   },
 
   fabText: {
@@ -171,6 +168,10 @@ export const styles = StyleSheet.create({
     color: colors.text,
   },
 
+  fabWithActiveWorkout: {
+    bottom: RFValue(110),
+  },
+
   deleteRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -178,7 +179,111 @@ export const styles = StyleSheet.create({
   },
 
   cardActive: {
-    elevation: 10,
-    zIndex: 10,
+    zIndex: 100,
+    elevation: 100,
+  },
+
+  startBtn: {
+    marginTop: RFValue(12),
+    backgroundColor: colors.buttonBackground,
+    paddingVertical: RFValue(12),
+    borderRadius: RFValue(10),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  startText: {
+    color: colors.text,
+    fontWeight: "700",
+    fontSize: RFValue(14),
+  },
+
+  activeWorkoutBar: {
+    position: "absolute",
+    bottom: RFValue(18),
+    left: RFValue(16),
+    right: RFValue(16),
+    backgroundColor: colors.cardBackground,
+    borderRadius: RFValue(16),
+    padding: RFValue(14),
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    zIndex: 50,
+  },
+
+  activeWorkoutContent: {
+    // Container sem estilos específicos
+  },
+
+  activeWorkoutHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: RFValue(8),
+  },
+
+  activeWorkoutLabel: {
+    fontSize: RFValue(12),
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: RFValue(6),
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+
+  activeWorkoutName: {
+    fontSize: RFValue(14),
+    fontWeight: "600",
+    color: colors.textSecondary,
+    opacity: 0.85,
+  },
+
+  // Adicionar dentro do StyleSheet.create, após activeWorkoutLabel
+  activeWorkoutTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: RFValue(6),
+  },
+
+  activeWorkoutTimer: {
+    fontSize: RFValue(14),
+    fontWeight: "700",
+    color: "#fff",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+    letterSpacing: 1,
+  },
+
+  cancelWorkoutBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: RFValue(6),
+    paddingVertical: RFValue(10),
+    paddingHorizontal: RFValue(12),
+    borderRadius: RFValue(8),
+    backgroundColor: "rgba(255, 77, 79, 0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 77, 79, 0.3)",
+  },
+
+  cancelWorkoutText: {
+    fontSize: RFValue(13),
+    fontWeight: "600",
+    color: "#ff4d4f",
+  },
+
+  activeWorkoutRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: RFValue(12),
+  },
+
+  activeWorkoutIcons: {
+    alignItems: "center",
+    gap: RFValue(8), // ← Espaçamento entre seta e lixo
   },
 });

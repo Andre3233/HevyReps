@@ -57,46 +57,55 @@ export const styles = StyleSheet.create({
   },
 
   modalOverlay: {
-  flex: 1,
-  backgroundColor: "rgba(0,0,0,0.5)",
-  justifyContent: "flex-end",
-},
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
 
-modalSheet: {
-  backgroundColor: colors.cardBackground,
-  borderTopLeftRadius: RFValue(20),
-  borderTopRightRadius: RFValue(20),
-  padding: RFValue(20),
-  gap: RFValue(12),
-},
+  modalSheet: {
+    backgroundColor: colors.cardBackground,
+    borderTopLeftRadius: RFValue(20),
+    borderTopRightRadius: RFValue(20),
+    padding: RFValue(20),
+    gap: RFValue(12),
+  },
 
-modalTitle: {
-  fontSize: RFValue(14),
-  fontWeight: "700",
-  color: colors.textSecondary,
-  textAlign: "center",
-  marginBottom: RFValue(4),
-},
+  modalTitle: {
+    fontSize: RFValue(14),
+    fontWeight: "700",
+    color: colors.textSecondary,
+    textAlign: "center",
+    marginBottom: RFValue(4),
+  },
 
-modalDeleteBtn: {
-  paddingVertical: RFValue(14),
-  alignItems: "center",
-},
+  modalDeleteBtn: {
+    paddingVertical: RFValue(14),
+    alignItems: "center",
+  },
 
-modalDeleteText: {
-  fontSize: RFValue(15),
-  fontWeight: "700",
-  color: "#ff4d4f",
-},
+  modalDeleteText: {
+    fontSize: RFValue(15),
+    fontWeight: "700",
+    color: "#ff4d4f",
+  },
 
-modalCancelBtn: {
-  paddingVertical: RFValue(14),
-  alignItems: "center",
-},
+  modalCancelBtn: {
+    paddingVertical: RFValue(14),
+    alignItems: "center",
+  },
 
-modalCancelText: {
-  fontSize: RFValue(15),
-  fontWeight: "600",
-  color: colors.text,
-},
+  modalCancelText: {
+    fontSize: RFValue(15),
+    fontWeight: "600",
+    color: colors.text,
+  },
+
+  checkbox: {
+    fontSize: 24,
+    textAlign: "center",
+  },
+
+  checkboxCompleted: {
+    color: "#4ade80",
+  },
 });

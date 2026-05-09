@@ -7,12 +7,17 @@ import {
   View,
   Alert,
 } from "react-native";
-import { useState, useContext, useCallback } from "react";
+import { useState, useContext, useCallback, useEffect } from "react";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { styles } from "../styles/Workouts.style";
 import { AuthContext } from "../context/AuthContext";
 import { listWorkouts, deleteWorkout } from "../api/workouts";
-import DropdownMenu from "../components/DropdownMenu";
+import { DropdownMenuWorkouts } from "../components/DropdownMenu";
+import { useWorkoutContext } from "../context/WorkoutContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MaterialIcons } from "@expo/vector-icons";
+import { RFValue } from "react-native-responsive-fontsize";
+import { colors } from "../styles/colors";
 
 function formatRelativeTime(dateString) {
   if (!dateString) return "Sem data";
@@ -65,11 +70,14 @@ function formatRelativeTime(dateString) {
 export default function Workouts() {
   const navigation = useNavigation();
   const { fetchWithAuth } = useContext(AuthContext);
+  const { startWorkout, activeWorkout, cancelWorkout } = useWorkoutContext();
 
   const [loading, setLoading] = useState(true);
   const [workouts, setWorkouts] = useState([]);
   const [openMenuWorkoutId, setOpenMenuWorkoutId] = useState(null);
   const [deletingWorkoutId, setDeletingWorkoutId] = useState(null);
+
+  const [elapsedTime, setElapsedTime] = useState("00:00:00");
 
   function openCreate() {
     navigation.navigate("WorkoutEditor", { mode: "create" });
@@ -115,6 +123,29 @@ export default function Workouts() {
     }, [loadWorkouts]),
   );
 
+  // Timer para o treino ativo
+  useEffect(() => {
+    if (!activeWorkout) {
+      setElapsedTime("00:00:00");
+      return;
+    }
+
+    // Função que calcula e atualiza o tempo decorrido
+    const updateTimer = () => {
+      const elapsed = Date.now() - activeWorkout.startTime;
+      setElapsedTime(formatElapsedTime(elapsed));
+    };
+
+    // Atualizar imediatamente
+    updateTimer();
+
+    // Atualizar a cada segundo
+    const interval = setInterval(updateTimer, 1000);
+
+    // Cleanup: limpar o interval quando o componente desmonta ou activeWorkout muda
+    return () => clearInterval(interval);
+  }, [activeWorkout]);
+
   function toggleWorkoutMenu(workoutId) {
     setOpenMenuWorkoutId((prev) => (prev === workoutId ? null : workoutId));
   }
@@ -156,6 +187,25 @@ export default function Workouts() {
     );
   }
 
+  async function handleStartWorkout(workout) {
+    console.log("WORKOUT:", JSON.stringify(workout, null, 2));
+    try {
+      await startWorkout(workout);
+      navigation.navigate("WorkoutSession");
+    } catch (error) {
+      Alert.alert("Erro", error.message);
+    }
+  }
+
+  function formatElapsedTime(milliseconds) {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -193,52 +243,123 @@ export default function Workouts() {
               const isDeleting = deletingWorkoutId === item.id;
 
               return (
-                <TouchableOpacity
-                  style={[styles.card, isMenuOpen && styles.cardActive]}
-                  activeOpacity={0.85}
-                  onPress={() => {
-                    setOpenMenuWorkoutId(null);
-                    openEdit(item);
-                  }}
-                >
-                  <View style={styles.cardHeaderRow}>
-                    <Text style={styles.cardTitle} numberOfLines={1}>
-                      {item.name}
-                    </Text>
+                <View style={[styles.card, isMenuOpen && styles.cardActive]}>
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={() => {
+                      setOpenMenuWorkoutId(null);
+                      openEdit(item);
+                    }}
+                  >
+                    <View style={styles.cardHeaderRow}>
+                      <Text style={styles.cardTitle} numberOfLines={1}>
+                        {item.name}
+                      </Text>
 
-                    <View style={styles.menuWrapper}>
-                      <DropdownMenu
-                        isOpen={isMenuOpen}
-                        onToggle={() => toggleWorkoutMenu(item.id)}
-                        onDelete={() => confirmDeleteWorkout(item.id)}
-                        deleteLabel="Apagar treino"
-                      />
+                      <View style={styles.menuWrapper}>
+                        <DropdownMenuWorkouts
+                          isOpen={isMenuOpen}
+                          onToggle={() => toggleWorkoutMenu(item.id)}
+                          onDelete={() => confirmDeleteWorkout(item.id)}
+                          deleteLabel="Apagar treino"
+                          openWorktEditor={() => openEdit(item)}
+                          mode="workouts"
+                        />
+                      </View>
                     </View>
-                  </View>
 
-                  <View style={styles.cardMetaRow}>
-                    <Text style={styles.cardSub}>
-                      {item.exerciseCount}{" "}
-                      {item.exerciseCount === 1 ? "exercício" : "exercícios"}
-                    </Text>
+                    <View style={styles.cardMetaRow}>
+                      <Text style={styles.cardSub}>
+                        {item.exerciseCount}{" "}
+                        {item.exerciseCount === 1 ? "exercício" : "exercícios"}
+                      </Text>
 
-                    <Text style={styles.cardSub}>
-                      {formatRelativeTime(item.updatedAt)}
+                      <Text style={styles.cardSub}>
+                        {formatRelativeTime(item.updatedAt)}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.startBtn, isMenuOpen && { zIndex: -1 }]}
+                    disabled={isMenuOpen}
+                    pointerEvents={isMenuOpen ? "none" : "auto"}
+                  >
+                    <Text
+                      style={styles.startText}
+                      onPress={() => handleStartWorkout(item)}
+                    >
+                      Iniar treino
                     </Text>
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                </View>
               );
             }}
           />
         </View>
       )}
       <TouchableOpacity
-        style={styles.fab}
+        style={[styles.fab, activeWorkout && styles.fabWithActiveWorkout]}
         onPress={openCreate}
         activeOpacity={0.85}
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
+      {activeWorkout && (
+        <TouchableOpacity
+          style={styles.activeWorkoutBar}
+          onPress={() => navigation.navigate("WorkoutSession")}
+          activeOpacity={0.85}
+        >
+          <View style={styles.activeWorkoutContent}>
+            <View style={styles.activeWorkoutRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.activeWorkoutLabel} numberOfLines={1}>
+                  TREINO ATIVO - {elapsedTime}
+                </Text>
+                <Text style={styles.activeWorkoutName} numberOfLines={1}>
+                  {activeWorkout.name}
+                </Text>
+              </View>
+
+              {/* Coluna direita: Seta + Lixo (verticalmente) */}
+              <View style={styles.activeWorkoutIcons}>
+                <MaterialIcons
+                  name="keyboard-arrow-up"
+                  size={24}
+                  color={colors.text}
+                />
+
+                <TouchableOpacity
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    Alert.alert(
+                      "Cancelar treino",
+                      "Tens a certeza que queres cancelar este treino? Todo o progresso será perdido.",
+                      [
+                        { text: "Não", style: "cancel" },
+                        {
+                          text: "Sim",
+                          style: "destructive",
+                          onPress: async () => {
+                            await cancelWorkout();
+                          },
+                        },
+                      ],
+                    );
+                  }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <MaterialIcons
+                    name="delete-outline"
+                    size={22}
+                    color="#ff4d4f"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

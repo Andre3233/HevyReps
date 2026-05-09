@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 import { colors } from "./src/styles/colors";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
+import { WorkoutProvider } from "./src/context/WorkoutContext";
 export default function App() {
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -16,7 +16,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <Navigation />
+        <WorkoutProvider>
+          <Navigation />
+        </WorkoutProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );
