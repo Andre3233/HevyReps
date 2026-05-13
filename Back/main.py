@@ -9,6 +9,7 @@ from core.firebase import initialize_firebase
 from services.exercise_dataset import ensure_dataset
 from routes.workouts import router as workouts
 from contextlib import asynccontextmanager
+from routes.workout_history import router as workout_history
  
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,6 +38,7 @@ app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(protected_router, prefix="/protected", tags=["Protected"])
 app.include_router(exercises_router, prefix="/exercises", tags=["Exercises"])
 app.include_router(workouts, prefix="/workouts", tags=["Workouts"])
+app.include_router(workout_history, prefix="/workout-history", tags=["Workout_history"])
 @app.get("/")
 def root():
     return {"status": "ok"}

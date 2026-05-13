@@ -3,12 +3,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { AuthContext } from "./AuthContext";
+import { createWorkoutHistory } from "../api/workout_history";
 
 const STORAGE_KEY = "@activeWorkout";
 const WorkoutContext = createContext();
 
 export function WorkoutProvider({ children }) {
-  const { user } = useContext(AuthContext);
+  const { fetchWithAuth } = useContext(AuthContext);
 
   const [activeWorkout, setActiveWorkout] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -84,22 +85,44 @@ export function WorkoutProvider({ children }) {
     const payload = {
       sessionId: activeWorkout.sessionId,
       workoutId: activeWorkout.workoutId,
-      owner_username: user.id,
       name: activeWorkout.name,
       startTime: new Date(activeWorkout.startTime).toISOString(),
       endTime: new Date().toISOString(),
-      exercises: activeWorkout.exercises.map((ex) => ({
-        id: ex.exerciseId,
-        name: ex.name,
-        exercise_sets: ex.exercise_sets.map(({ repetitions, weight }) => ({
-          repetitions,
-          weight,
-        })),
-      })),
+      exercises: activeWorkout.exercises
+        .map((ex) => ({
+          id: ex.exerciseId,
+          name: ex.name,
+          exercise_sets: ex.exercise_sets
+            .filter((set) => set.completed)
+            .filter(
+              (set) =>
+                set.repetitions !== null &&
+                set.repetitions > 0 &&
+                set.weight !== null &&
+                set.weight >= 0,
+            ) // para garantir que sets concluidos vão com dados 
+            .map(({ repetitions, weight }) => ({
+              repetitions,
+              weight,
+            })),
+        }))
+        .filter((ex) => ex.exercise_sets.length > 0),
     };
 
-    setActiveWorkout(null);
-    await _syncToAsyncStorage(null);
+    console.log("PAYLOAD ENVIADO:", JSON.stringify(payload, null, 2));
+    // Guarda no Back
+    try {
+      await createWorkoutHistory(fetchWithAuth, payload);
+
+      // Só limpa depois de guardar com sucesso
+      setActiveWorkout(null);
+      await _syncToAsyncStorage(null);
+    } catch (error) {
+      // Se falhar, mantém o activeWorkout
+      throw new Error(
+        `Erro ao guardar treino: ${error.detail || error.message}`,
+      );
+    }
   }
 
   function addSet(instanceId) {
