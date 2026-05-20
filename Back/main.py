@@ -39,6 +39,8 @@ app.include_router(protected_router, prefix="/protected", tags=["Protected"])
 app.include_router(exercises_router, prefix="/exercises", tags=["Exercises"])
 app.include_router(workouts, prefix="/workouts", tags=["Workouts"])
 app.include_router(workout_history, prefix="/workout-history", tags=["Workout_history"])
+app.include_router(user_router, prefix="/stats", tags=["User_stats"])
+
 @app.get("/")
 def root():
     return {"status": "ok"}
