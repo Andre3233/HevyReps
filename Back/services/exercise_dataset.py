@@ -2,6 +2,7 @@ import os
 import json
 import urllib.request
 from typing import Any, Dict, List,Optional
+from services.translation_service import translate_to_english, translate_to_portuguese, translate_list_to_portuguese
 
 # URL do dataset
 DATASET_URL = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json"
@@ -75,30 +76,38 @@ def list_exercises(search: Optional[str] = None, limit: int = 30, offset: int = 
     
     if search:
         s = search.strip().lower()
-        if s: 
-            results = [e for e in results if s in str(e.get("name","")).lower()]
+        if s:
+            # Traduzir pesquisa de PT→EN antes de procurar
+            s_translated = translate_to_english(s)
+            results = [e for e in results if s_translated in str(e.get("name","")).lower()]
         
-    total_count = len(results) #Guarda o total antes do corte
+    total_count = len(results)
         
-    paginated_results = results[offset: offset + limit] #limita para não devolver milhares de exercicios e ex. repetidos
+    paginated_results = results[offset: offset + limit]
     
     items = []
     for e in paginated_results:
         primary = (e.get("primaryMuscles") or [""])[0]
-        secondary = e.get("secondaryMuscles") or []
+        
+        # Traduzir nome e músculos para PT
+        name_en = str(e.get("name", ""))
+        name_pt = translate_to_portuguese(name_en)
+        
+        primary_pt = translate_to_portuguese(str(primary))
+        
         items.append({
             "id": str(e.get("id")),
-            "name": str(e.get("name", "")),
-            "primary_muscle": str(primary),
-            "secondary_muscles": [str(x) for x in secondary],
+            "name": name_pt,
+            "primary_muscle": primary_pt,
             "frames": build_frames(e),
         })
-    return{
+    
+    return {
         "items": items,
         "total": total_count,
     }
     
-def get_exercise(exercise_id: str) -> Optional[Dict[str, Any]]: #Devolve detalhes de um exercicio po id
+def get_exercise(exercise_id: str) -> Optional[Dict[str, Any]]:
     load_dataset()
     
     raw = BY_ID.get(str(exercise_id))
@@ -115,14 +124,27 @@ def get_exercise(exercise_id: str) -> Optional[Dict[str, Any]]: #Devolve detalhe
     equipment = raw.get("equipment")
     body_part = raw.get("bodyPart")
     
-    return{
-        "id": str(raw.get("id")),
-        "name": str(raw.get("name", "")),
-        "primary_muscle": str(primary),
-        "secondary_muscles": [str(x) for x in secondary],
-        "frames": build_frames(raw),
-        "instructions": [str(x) for x in instructions],
-        "equipment": equipment,
-        "body_part": body_part,
-    }
+    # Traduzir todos os campos para português
+    name_en = str(raw.get("name", ""))
+    name_pt = translate_to_portuguese(name_en)
+    
+    primary_pt = translate_to_portuguese(str(primary))
+    secondary_pt = [translate_to_portuguese(str(x)) for x in secondary]
+    
+    instructions_en = [str(x) for x in instructions]
+    instructions_pt = translate_list_to_portuguese(instructions_en)
 
+    
+    equipment_pt = translate_to_portuguese(str(equipment)) if equipment else None
+    body_part_pt = translate_to_portuguese(str(body_part)) if body_part else None
+    
+    return {
+        "id": str(raw.get("id")),
+        "name": name_pt,
+        "primary_muscle": primary_pt,
+        "secondary_muscles": secondary_pt,
+        "frames": build_frames(raw),
+        "instructions": instructions_pt,
+        "equipment": equipment_pt,
+        "body_part": body_part_pt,
+    }

@@ -5,6 +5,7 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { styles } from "../styles/ExerciseInfo.style";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -32,7 +33,7 @@ export default function ExerciseInfo() {
         const data = await getExercise(fetchWithAuth, id);
         setExerciseData(data);
       } catch (error) {
-        console.log("Erro ao buscar exercício: ", error);
+        console.log("[ERROR] Erro ao buscar exercício:", error);
       } finally {
         setLoading(false);
       }
@@ -55,6 +56,33 @@ export default function ExerciseInfo() {
         >
           <Text style={styles.btnTextError}>Voltar</Text>
         </TouchableOpacity>
+      </View>
+    );
+  }
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <StatusBar style="dark" />
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={handleGoBack}
+            style={styles.backButton}
+            hitSlop={{
+              top: RFValue(22),
+              bottom: RFValue(22),
+              left: RFValue(22),
+              right: RFValue(22),
+            }}
+          >
+            <MaterialIcons name="arrow-back" size={RFValue(20)} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{name}</Text>
+        </View>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text style={styles.infoText}>A carregar...</Text>
+        </View>
       </View>
     );
   }

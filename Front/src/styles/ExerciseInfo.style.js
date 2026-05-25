@@ -11,25 +11,23 @@ export const styles = StyleSheet.create({
   },
 
   header: {
-    height: RFValue(40),
-    justifyContent: "center",
+    marginBottom: RFValue(10),
   },
 
   backButton: {
-    position: "absolute",
-    left: 0,
+    alignSelf: "flex-start",
     padding: RFValue(6),
     backgroundColor: colors.cardBackground,
     borderRadius: RFValue(8),
   },
 
   headerTitle: {
+    marginTop: RFValue(-14),
     textAlign: "center",
-    fontSize: RFValue(16),
+    fontSize: RFValue(18),
     fontWeight: "800",
     color: colors.text,
   },
-
   errortext: {
     fontSize: RFValue(20),
     color: colors.textSecondary,

@@ -5,9 +5,9 @@ export async function exerciseResponse(response) {
 
   try {
     data = await response.json();
-  } catch {
+  } catch (e) {
     if (!response.ok) {
-      throw { detail: "Erro no servido. " };
+      throw { detail: "Erro no servidor." };
     }
     return [];
   }
@@ -19,23 +19,33 @@ export async function exerciseResponse(response) {
   return data;
 }
 
-export async function listExercises({search = "", limit=30, offset=0,} = {}) {
-    const params = new URLSearchParams()
-    const trimmedSearch = search.trim()
+export async function listExercises({
+  search = "",
+  limit = 30,
+  offset = 0,
+} = {}) {
+  const params = new URLSearchParams();
+  const trimmedSearch = search.trim();
 
-    if(trimmedSearch){
-        params.append("search", trimmedSearch)
-    }
+  if (trimmedSearch) {
+    params.append("search", trimmedSearch);
+  }
 
-    params.append("limit", String(limit))
-    params.append("offset", String(offset))
+  params.append("limit", String(limit));
+  params.append("offset", String(offset));
 
-    const response = await fetch(`${BACKEND_URL}/exercises/?${params.toString()}`,{method: "GET",})
+  const response = await fetch(
+    `${BACKEND_URL}/exercises/?${params.toString()}`,
+    { method: "GET" },
+  );
 
-    return await exerciseResponse(response)
+  return await exerciseResponse(response);
 }
 
 export async function getExercise(fetchWithAuth, exerciseId) {
-  const response = await fetchWithAuth(`${BACKEND_URL}/exercises/${exerciseId}`, {method: "GET",})
-  return await exerciseResponse(response)
+  const response = await fetchWithAuth(
+    `${BACKEND_URL}/exercises/${exerciseId}`,
+    { method: "GET" },
+  );
+  return await exerciseResponse(response);
 }

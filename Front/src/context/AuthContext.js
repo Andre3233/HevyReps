@@ -156,7 +156,7 @@ export function AuthProvider({ children }) {
           "Content-Type": "application/json",
         },
       },
-      5000,
+      15000,
     );
 
     if (response.status === 401) {
@@ -172,7 +172,7 @@ export function AuthProvider({ children }) {
             "Content-Type": "application/json",
           },
         },
-        5000,
+        15000,
       );
     }
 
