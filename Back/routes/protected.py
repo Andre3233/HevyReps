@@ -5,8 +5,8 @@ router = APIRouter()
 
 @router.get("/")
 def protected_route(token: str = Depends(oauth2_scheme)):
-    username = verify_access_token(token)
+    user_id = verify_access_token(token)
     return {
         "status": "Token válido",
-        "username": username
+        "user_id": user_id
     }

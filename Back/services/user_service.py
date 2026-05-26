@@ -29,20 +29,19 @@ def create_user(username: str, email: str, password_hash: str, profile_image_url
     
     return user_data
 
-def get_user_stats(db, owner_username: str) -> dict:
+def get_user_stats(db, owner_id: str) -> dict:
     # 1. Busca dados do utilizador na coleção users
     users_ref = db.collection("users")
-    user_query = users_ref.where("username", "==", owner_username).limit(1)
-    user_docs = list(user_query.stream())
+    user_doc = users_ref.document(owner_id).get()
     
-    if not user_docs:
+    if not user_doc.exists:
         raise ValueError("Utilizador não encontrado")
     
-    user_data = user_docs[0].to_dict()
+    user_data = user_doc.to_dict()
     
     # 2. Conta workouts do utilizador
     workout_history_ref = db.collection("workout_history")
-    query = workout_history_ref.where("owner_username", "==", owner_username)
+    query = workout_history_ref.where("owner_id", "==", owner_id)
     workouts = list(query.stream())
     total_workouts = len(workouts)
     

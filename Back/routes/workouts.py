@@ -9,11 +9,11 @@ router = APIRouter()
 @router.post("/", response_model=WorkoutDetail, status_code=status.HTTP_201_CREATED)
 def create_workout_route( payload: WorkoutCreate, token: str = Depends(oauth2_scheme),): 
     #Cria um treino novo para um user autenticado
-    owner_username = verify_access_token(token)
+    owner_id = verify_access_token(token)
     db = get_db()
     
     try:
-        created = create_workout(db, owner_username, payload.model_dump())
+        created = create_workout(db, owner_id, payload.model_dump())
         return created
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -22,11 +22,11 @@ def create_workout_route( payload: WorkoutCreate, token: str = Depends(oauth2_sc
     
 @router.get("/", response_model=list[WorkoutDetail])
 def list_workouts_route(limit: int = Query(default=50, ge=1, le=100), token: str = Depends(oauth2_scheme)):
-    owner_username = verify_access_token(token)
+    owner_id = verify_access_token(token)
     db = get_db()
     
     try:
-        workouts = list_workouts(db, owner_username, limit=limit)
+        workouts = list_workouts(db, owner_id, limit=limit)
         return workouts
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -37,11 +37,11 @@ def list_workouts_route(limit: int = Query(default=50, ge=1, le=100), token: str
 def update_workout_route(workout_id: str, payload: WorkoutUpdate, token: str = Depends(oauth2_scheme)):
     #Atualiza o nome e os exercicios de um treino
     
-    owner_username = verify_access_token(token)
+    owner_id = verify_access_token(token)
     db = get_db()
     
     try:
-        updated = update_workout(db, owner_username, workout_id, payload.model_dump(exclude_none=True))
+        updated = update_workout(db, owner_id, workout_id, payload.model_dump(exclude_none=True))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception:
@@ -54,11 +54,11 @@ def update_workout_route(workout_id: str, payload: WorkoutUpdate, token: str = D
 
 @router.delete("/{workout_id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_workout_route(workout_id: str, token: str = Depends(oauth2_scheme)):
-    owner_username = verify_access_token(token)
+    owner_id = verify_access_token(token)
     db = get_db()
     
     try:
-        deleted = delete_workout(db, owner_username, workout_id)
+        deleted = delete_workout(db, owner_id, workout_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception:

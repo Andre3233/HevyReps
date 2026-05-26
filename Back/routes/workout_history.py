@@ -11,11 +11,11 @@ def create_workout_history_route(
     payload: WorkoutHistoryCreate, 
     token: str = Depends(oauth2_scheme)
 ): 
-    owner_username = verify_access_token(token)
+    owner_id = verify_access_token(token)
     db = get_db()
     
     try:
-        created = create_workout_history(db, owner_username, payload.model_dump())
+        created = create_workout_history(db, owner_id, payload.model_dump())
         return created
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -27,11 +27,11 @@ def list_workout_history_route(
     limit: int = Query(default=50, ge=1, le=100), 
     token: str = Depends(oauth2_scheme)
 ):
-    owner_username = verify_access_token(token)
+    owner_id = verify_access_token(token)
     db = get_db()
     
     try:
-        history = list_workout_history(db, owner_username, limit=limit)
+        history = list_workout_history(db, owner_id, limit=limit)
         return history
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -43,11 +43,11 @@ def delete_workout_history_route(
     workout_id: str, 
     token: str = Depends(oauth2_scheme)
 ):
-    owner_username = verify_access_token(token)
+    owner_id = verify_access_token(token)
     db = get_db()
     
     try:
-        deleted = delete_workout_history(db, owner_username, workout_id)
+        deleted = delete_workout_history(db, owner_id, workout_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception:

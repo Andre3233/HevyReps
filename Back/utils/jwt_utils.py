@@ -41,14 +41,14 @@ def verify_access_token(token: str):
                 detail="Tipo de token invalido"
             )
 
-        username = payload.get("sub")
+        user_id = payload.get("sub")
 
-        if username is None:
+        if user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token inválido"
             )
-        return username
+        return user_id
     
     except JWTError:
         raise HTTPException(

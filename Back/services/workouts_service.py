@@ -18,9 +18,9 @@ def _doc_to_workout(doc) -> Dict[str, Any]:
     return data
 
 #CRUD
-def create_workout(db, owner_username: str, data: Dict[str, Any]) -> Dict[str, Any]:
-    if not owner_username or not str(owner_username).strip():
-        raise ValueError("owner_username inválido")
+def create_workout(db, owner_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    if not owner_id or not str(owner_id).strip():
+        raise ValueError("owner_id inválido")
     
     name = _normalize_name(str(data.get("name","")))
     if not name:
@@ -31,7 +31,7 @@ def create_workout(db, owner_username: str, data: Dict[str, Any]) -> Dict[str, A
     now = now_iso()
     
     payload = {
-        "owner_username": owner_username,
+        "owner_id": owner_id,
         "name": name,
         "exercises": exercises, #lista de objetos com id, nome e sets
         "exercise_count": len(exercises),
@@ -47,10 +47,10 @@ def create_workout(db, owner_username: str, data: Dict[str, Any]) -> Dict[str, A
     created["id"] = ref.id 
     return created
 
-def list_workouts(db, owner_username: str, limit: int = 50) -> List[Dict[str, Any]]: 
+def list_workouts(db, owner_id: str, limit: int = 50) -> List[Dict[str, Any]]: 
     #Lista os treinos do utilizador por ordem do updated_at (mais recentes)
-    if not owner_username or not str(owner_username).strip():
-        raise ValueError("owner_username inválido")
+    if not owner_id or not str(owner_id).strip():
+        raise ValueError("owner_id inválido")
     
     #Limita o número de treinos retornados para evitar sobrecarregar o cliente e o servidor
     if limit < 1:
@@ -60,7 +60,7 @@ def list_workouts(db, owner_username: str, limit: int = 50) -> List[Dict[str, An
         
     query = (
         _workouts_collection(db)
-        .where("owner_username","==", owner_username)
+        .where("owner_id","==", owner_id)
         .order_by("updated_at", direction="DESCENDING")
         .limit(limit)
     )
@@ -68,7 +68,7 @@ def list_workouts(db, owner_username: str, limit: int = 50) -> List[Dict[str, An
     docs = query.stream()
     return[_doc_to_workout(d) for d in docs]
 
-def _get_workout(db, owner_username: str, workout_id: str) -> Optional[Dict[str, Any]]: 
+def _get_workout(db, owner_id: str, workout_id: str) -> Optional[Dict[str, Any]]: 
     #Helper interno: vai buscar 1 treino especifico e verifica se pertence ao user
     if not workout_id or not str(workout_id).strip():
         raise ValueError("workout_id inválido")
@@ -82,15 +82,15 @@ def _get_workout(db, owner_username: str, workout_id: str) -> Optional[Dict[str,
     data = _doc_to_workout(snap)
     
      # por segurança não deixas ir buscar treinos de outra pessoa
-    if data.get("owner_username") != owner_username:
+    if data.get("owner_id") != owner_id:
         return None
     
     return data
 
-def update_workout(db, owner_username: str, workout_id: str, data: Dict[str,Any]) -> Optional[Dict[str, Any]]:
+def update_workout(db, owner_id: str, workout_id: str, data: Dict[str,Any]) -> Optional[Dict[str, Any]]:
     #Atualiza nome e lista de exercícios
     
-    current = _get_workout(db, owner_username, workout_id)
+    current = _get_workout(db, owner_id, workout_id)
     if current is None:
         return None
     
@@ -121,8 +121,8 @@ def update_workout(db, owner_username: str, workout_id: str, data: Dict[str,Any]
     merged["id"] = workout_id
     return merged
 
-def delete_workout(db, owner_username: str, workout_id: str) -> bool:
-    current = _get_workout(db, owner_username, workout_id)
+def delete_workout(db, owner_id: str, workout_id: str) -> bool:
+    current = _get_workout(db, owner_id, workout_id)
     if current is None:
         return False
     

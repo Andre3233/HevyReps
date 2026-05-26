@@ -37,11 +37,11 @@ def register(user: UserCreate): # Enspoint para criar um novo utilizador
     
 @router.get("/stats")
 def get_user_stats_route(token: str = Depends(oauth2_scheme)):
-    owner_username = verify_access_token(token)
+    owner_id = verify_access_token(token)
     db = get_db()
     
     try:
-        stats = get_user_stats(db, owner_username)
+        stats = get_user_stats(db, owner_id)
         return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao obter estatísticas: {str(e)}")

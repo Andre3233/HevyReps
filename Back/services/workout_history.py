@@ -14,9 +14,9 @@ def _doc_to_workout(doc) -> Dict[str, Any]:
     data["id"] = doc.id
     return data
 
-def create_workout_history(db, owner_username: str, data: Dict[str, Any]) -> Dict[str, Any]:
-    if not owner_username.strip():
-        raise ValueError("owner_username inválido")
+def create_workout_history(db, owner_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    if not owner_id.strip():
+        raise ValueError("owner_id inválido")
     
     session_id = data.get("sessionId")
     if not session_id.strip():
@@ -25,7 +25,7 @@ def create_workout_history(db, owner_username: str, data: Dict[str, Any]) -> Dic
     # Prevenir duplicados
     existing_query = (
         _workouts_history_collection(db)
-        .where(filter=FieldFilter("owner_username", "==", owner_username))
+        .where(filter=FieldFilter("owner_id", "==", owner_id))
         .where(filter=FieldFilter("sessionId", "==", session_id))
         .limit(1)
     )
@@ -58,7 +58,7 @@ def create_workout_history(db, owner_username: str, data: Dict[str, Any]) -> Dic
     duration = int((end_time - start_time).total_seconds())
     
     payload = {
-        "owner_username": owner_username,
+        "owner_id": owner_id,
         "sessionId": data.get("sessionId"),
         "workoutId": data.get("workoutId"),
         "name": data.get("name"),
@@ -79,7 +79,7 @@ def create_workout_history(db, owner_username: str, data: Dict[str, Any]) -> Dic
     created["id"] = ref.id 
     return created
 
-def _get_workout_history(db, owner_username: str, workout_id: str) -> Optional[Dict[str, Any]]:
+def _get_workout_history(db, owner_id: str, workout_id: str) -> Optional[Dict[str, Any]]:
     #Helper interno para ir buscar e validar se pertence ao user
     if not workout_id.strip():
         raise ValueError("Id inválido")
@@ -93,15 +93,15 @@ def _get_workout_history(db, owner_username: str, workout_id: str) -> Optional[D
     data = _doc_to_workout(snap)
     
      # por segurança não deixas ir buscar treinos de outra pessoa
-    if data.get("owner_username") != owner_username:
+    if data.get("owner_id") != owner_id:
         return None
     
     return data
 
-def list_workout_history(db, owner_username: str, limit: int = 50) -> List[Dict[str, Any]]:
+def list_workout_history(db, owner_id: str, limit: int = 50) -> List[Dict[str, Any]]:
         #Lista os treinos do utilizador pelo mais recente
-    if not owner_username.strip():
-        raise ValueError("owner_username inválido")
+    if not owner_id.strip():
+        raise ValueError("owner_id inválido")
     
     #Limita o número de treinos retornados para evitar sobrecarregar o cliente e o servidor
     if limit < 1:
@@ -111,7 +111,7 @@ def list_workout_history(db, owner_username: str, limit: int = 50) -> List[Dict[
         
     query = (
         _workouts_history_collection(db)
-        .where("owner_username","==", owner_username)
+        .where("owner_id","==", owner_id)
         .order_by("created_at", direction="DESCENDING")
         .limit(limit)
     )
@@ -119,8 +119,8 @@ def list_workout_history(db, owner_username: str, limit: int = 50) -> List[Dict[
     docs = query.stream()
     return[_doc_to_workout(d) for d in docs]
 
-def delete_workout_history(db, owner_username: str, workout_id: str) -> bool:
-    current = _get_workout_history(db, owner_username, workout_id)
+def delete_workout_history(db, owner_id: str, workout_id: str) -> bool:
+    current = _get_workout_history(db, owner_id, workout_id)
     if current is None:
         return False
     

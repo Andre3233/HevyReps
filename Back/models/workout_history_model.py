@@ -23,7 +23,7 @@ class WorkoutHistoryDetail(BaseModel): #Molde final dos dados para guardar
     id: str
     sessionId: str #ID da sessão do treino 
     workoutId: str #Id do treino em sí
-    owner_username: str
+    owner_id: str
     name: str
     startTime: datetime
     endTime: datetime
@@ -31,5 +31,5 @@ class WorkoutHistoryDetail(BaseModel): #Molde final dos dados para guardar
     totalVolume: float
     totalSets: int
     duration: int  # segundos
-    created_at: str 
+    created_at: str
     
