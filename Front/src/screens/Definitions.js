@@ -1,49 +1,106 @@
 import { StatusBar } from "expo-status-bar";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  View,
-  ActivityIndicator,
-} from "react-native";
-import { styles } from "../styles/Login.style";
-import { useState, useContext } from "react";
-import { PasswordInput, IdentifierInput } from "../components/Input";
-import { ImgDefault } from "../components/ImgProfile";
-import { Button, LinkButton } from "../components/Button";
+import { View, Text, Alert, ScrollView, TouchableOpacity } from "react-native";
+import { useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { loginUser } from "../api/loginUser";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SecureStore from "expo-secure-store";
+import { MaterialIcons } from "@expo/vector-icons";
 import { AuthContext } from "../context/AuthContext";
+import { styles } from "../styles/Defenitions.style";
+
+function SettingsRow({ icon, label, onPress }) {
+  return (
+    <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.7}>
+      <View style={styles.rowLeft}>
+        <View style={styles.iconBox}>
+          <MaterialIcons name={icon} size={22} color="#c3c6d0" />
+        </View>
+        <Text style={styles.rowLabel}>{label}</Text>
+      </View>
+      <MaterialIcons name="chevron-right" size={22} color="#8d9199" />
+    </TouchableOpacity>
+  );
+}
 
 export default function Defenitions() {
-  const { signOut } = useContext(AuthContext);
+  const { signOut, deleteAccount } = useContext(AuthContext);
   const navigation = useNavigation();
 
+  function handleDelete() {
+    Alert.alert("Apagar conta", "Esta ação é irreversível", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Apagar",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteAccount();
+          } catch (e) {
+            console.log(e.message);
+          }
+        },
+      },
+    ]);
+  }
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "padding"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
-    >
+    <View style={styles.container}>
+      <StatusBar style="light" />
+
+      <View style={styles.header}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <MaterialIcons name="arrow-back" size={24} color="#ffff" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Definições</Text>
+        </View>
+      </View>
+
       <ScrollView
-        style={styles.scrollview}
         contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.content}>
-          <StatusBar style="dark" />
-          <View style={styles.headerTop}>
-            <Text style={styles.title}>Defenições</Text>
-          </View>
-          <Button
-            title={"Logout"}
+        {/* Secção conta */}
+        <View style={styles.section}>
+          <SettingsRow
+            icon="person"
+            label="Mudar nome de utilizador"
+            onPress={() =>
+              navigation.navigate("EditAccount", { mode: "username" })
+            }
+          />
+          <View style={styles.separator} />
+          <SettingsRow
+            icon="lock"
+            label="Mudar palavra-passe"
+            onPress={() =>
+              navigation.navigate("EditAccount", { mode: "password" })
+            }
+          />
+        </View>
+
+        {/* Botões de sessão */}
+        <View style={styles.actionsSection}>
+          <TouchableOpacity
+            style={styles.logoutButton}
             onPress={signOut}
-          ></Button>
+            activeOpacity={0.7}
+          >
+            <MaterialIcons name="logout" size={20} color="#ffffff" />
+            <Text style={styles.logoutText}>Terminar sessão</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleDelete}
+            activeOpacity={0.7}
+          >
+            <MaterialIcons name="delete-forever" size={20} color="#ffb4ab" />
+            <Text style={styles.deleteText}>Apagar conta</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }

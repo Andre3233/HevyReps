@@ -52,3 +52,62 @@ def get_user_stats(db, owner_id: str) -> dict:
         "profile_image_url": user_data.get("profile_image_url"),
         "total_workouts": total_workouts
     }
+    
+def delete_user(db, user_id: str):
+
+    # Apagar workouts
+    workouts = (
+        db.collection("workouts")
+        .where("owner_id", "==", user_id)
+        .stream()
+    )
+
+    for doc in workouts:
+        doc.reference.delete()
+
+    # Apagar histórico de workouts
+    history = (
+        db.collection("workout_history")
+        .where("owner_id", "==", user_id)
+        .stream()
+    )
+
+    for doc in history:
+        doc.reference.delete()
+
+    # Apagar utilizador
+    db.collection("users").document(user_id).delete()
+
+def update_username(db, user_id: str, new_username: str):
+
+    users_ref = db.collection("users")
+    new_username = new_username.strip()
+    if not new_username:
+        raise ValueError("Username inválido")
+
+    # verificar se já existe
+    existing = users_ref.where("username", "==", new_username).limit(1).get()
+    if existing and existing[0].id != user_id:
+        raise ValueError("Username já existe")
+
+    user_ref = users_ref.document(user_id)
+
+    if not user_ref.get().exists:
+        raise ValueError("Utilizador não encontrado")
+
+    user_ref.update({
+        "username": new_username
+    })
+
+    return new_username
+
+def update_password(db, user_id: str, password_hash: str):
+
+    user_ref = db.collection("users").document(user_id)
+
+    if not user_ref.get().exists:
+        raise ValueError("Utilizador não encontrado")
+
+    user_ref.update({
+        "password_hash": password_hash
+    })

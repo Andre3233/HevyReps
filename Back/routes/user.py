@@ -1,12 +1,11 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from models.user_model import UserCreate 
+from models.user_model import UserCreate, UpdatePasswordRequest
 from utils.security import hash_password # Função do hasher da pass
-from services.user_service import create_user, get_user_stats
+from services.user_service import create_user, get_user_stats, delete_user, update_username, update_password
 from utils.jwt_utils import oauth2_scheme, verify_access_token
 from core.firebase_utils import get_db
-from core.firebase_utils import get_db
+
 router = APIRouter() #Server modular
-from services.user_service import create_user, get_user_stats
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(user: UserCreate): # Enspoint para criar um novo utilizador
@@ -45,3 +44,64 @@ def get_user_stats_route(token: str = Depends(oauth2_scheme)):
         return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao obter estatísticas: {str(e)}")
+
+@router.delete("/delete")
+def delete_user_route(token: str = Depends(oauth2_scheme)):
+    user_id = verify_access_token(token)
+    db = get_db()
+
+    try:
+        delete_user(db, user_id)
+        return {
+            "success": True,
+            "message": "Conta apagada com sucesso"
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+@router.put("/username")
+def update_username_route(
+    body: dict,
+    token: str = Depends(oauth2_scheme)
+):
+    user_id = verify_access_token(token)
+    db = get_db()
+
+    username = body.get("username")
+
+    if not username:
+        raise HTTPException(status_code=400, detail="Username inválido")
+
+    try:
+        updated = update_username(db, user_id, username)
+
+        return {
+            "success": True,
+            "data": {
+                "username": updated
+            }
+        }
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+@router.put("/password")
+def update_password_route(
+    body: UpdatePasswordRequest,
+    token: str = Depends(oauth2_scheme)
+):
+    user_id = verify_access_token(token)
+    db = get_db()
+
+    try:
+        hashed = hash_password(body.password)
+        update_password(db, user_id, hashed)
+        return {"success": True, "message": "Password atualizada"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

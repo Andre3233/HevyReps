@@ -5,6 +5,11 @@ import { jwtDecode } from "jwt-decode";
 import { BACKEND_URL } from "../api/config";
 import { refreshAccessToken as refreshAccessTokenApi } from "../api/AuthToken";
 import { loginUser } from "../api/loginUser";
+import {
+  deleteAccount as deleteAccountApi,
+  updateUsername,
+  updatePassword,
+} from "../api/defenitions";
 
 export const AuthContext = createContext();
 
@@ -252,6 +257,33 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function deleteAccount() {
+    try {
+      await deleteAccountApi(fetchWithAuth);
+      await signOut();
+    } catch (e) {
+      console.log("ERRO DELETE:", e);
+    }
+  }
+
+  async function changeUsername(username) {
+    const res = await updateUsername(fetchWithAuth, username);
+
+    const updated = res.data.username;
+
+    const updatedUser = {
+      ...user,
+      username: updated,
+    };
+
+    setUser(updatedUser);
+    await AsyncStorage.setItem("@user", JSON.stringify(updatedUser));
+  }
+
+  async function changePassword(password) {
+    await updatePassword(fetchWithAuth, password);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -264,6 +296,9 @@ export function AuthProvider({ children }) {
         signOut,
         fetchWithAuth,
         refreshAccessToken,
+        deleteAccount,
+        changeUsername,
+        changePassword,
       }}
     >
       {children}

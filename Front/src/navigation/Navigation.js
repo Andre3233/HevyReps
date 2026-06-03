@@ -7,6 +7,7 @@ import Defenitions from "../screens/Definitions";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 import MainTabs from "./MainTabs";
+import DefenitionsStack from "./DefenitionsStack";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,7 +26,7 @@ export function Navigation() {
             />
             <Stack.Screen
               name="Defenitions"
-              component={Defenitions}
+              component={DefenitionsStack}
               options={{ animation: "slide_from_right" }}
             />
           </>

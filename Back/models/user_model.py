@@ -25,3 +25,13 @@ class UserCreate(BaseModel):
         if not PASSWORD_REGEX.fullmatch(value):
             raise ValueError("A password contém caracteres inválidos. Só são permitidos a-z, A-Z, 0-9, _, ! @ # $ % ^ & * ( ) | + = . ?")
         return value
+    
+class UpdatePasswordRequest(BaseModel):
+    password: str = Field(min_length=6)
+
+    @field_validator("password")
+    @classmethod
+    def password_NOEmojis(cls, value: str) -> str:
+        if not PASSWORD_REGEX.fullmatch(value):
+            raise ValueError("A password contém caracteres inválidos. Só são permitidos a-z, A-Z, 0-9, _, ! @ # $ % ^ & * ( ) | + = . ?")
+        return value

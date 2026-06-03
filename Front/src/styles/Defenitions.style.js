@@ -1,42 +1,114 @@
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import { colors } from "./colors";
-import { RFValue } from "react-native-responsive-fontsize"; //Adapta tamanhos que eram fixos para acrãs diferendes
 
 export const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: colors.background,
-    flex: 1,
-    padding: RFValue(10), //marge para de safe area
-  },
-
-  scrollview: {
-    flex: 1,
-  },
-
-  scrollContent: {
-    flexGrow: 1,
-  },
-
-  title: {
-    fontSize: RFValue(36),
-    fontWeight: "bold",
-    color: colors.text,
-    textAlign: "center",
-    marginTop: RFValue(15),
-  },
-
-  content: {
-    flex: 1,
-    paddingHorizontal: RFValue(24),
-    paddingTop: RFValue(37),
-    paddingBottom: RFValue(24),
   },
 
   header: {
-    marginBottom: RFValue(25),
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: RFValue(20),
+    paddingTop: RFValue(20),
+    paddingBottom: RFValue(16),
+    gap: RFValue(12),
   },
 
-  headerTop: {
-    justifyContent: "center", // centro horizontal
+  title: {
+    fontSize: RFValue(24),
+    fontWeight: "700",
+    color: colors.text,
+  },
+
+  scrollContent: {
+    paddingHorizontal: RFValue(20),
+    paddingBottom: RFValue(40),
+  },
+
+  // Secção com as rows
+  section: {
+    backgroundColor: "#171f33",
+    borderRadius: RFValue(14),
+    overflow: "hidden",
+    marginBottom: RFValue(24),
+  },
+
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: RFValue(14),
+    paddingHorizontal: RFValue(16),
+  },
+
+  rowLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  iconBox: {
+    width: RFValue(38),
+    height: RFValue(38),
+    borderRadius: RFValue(10),
+    backgroundColor: "#334155",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: RFValue(14),
+  },
+
+  rowLabel: {
+    fontSize: RFValue(16),
+    fontWeight: "600",
+    color: colors.text,
+  },
+
+  separator: {
+    height: 1,
+    backgroundColor: "rgba(67, 71, 79, 0.4)",
+    marginHorizontal: RFValue(16),
+  },
+
+  // Botões de ação
+  actionsSection: {
+    gap: RFValue(12),
+  },
+
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: RFValue(52),
+    backgroundColor: "#171f33",
+    borderRadius: RFValue(14),
+    borderWidth: 1,
+    borderColor: "rgba(67, 71, 79, 0.3)",
+    gap: RFValue(8),
+  },
+
+  logoutText: {
+    fontSize: RFValue(16),
+    fontWeight: "600",
+    color: colors.text,
+  },
+
+  deleteButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: RFValue(52),
+    backgroundColor: "rgba(147, 0, 10, 0.15)",
+    borderRadius: RFValue(14),
+    borderWidth: 1,
+    borderColor: "rgba(255, 180, 171, 0.3)",
+    gap: RFValue(8),
+  },
+
+  deleteText: {
+    fontSize: RFValue(16),
+    fontWeight: "600",
+    color: "#ffb4ab",
   },
 });
