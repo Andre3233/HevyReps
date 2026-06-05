@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from models.user_model import UserCreate, UpdatePasswordRequest
 from utils.security import hash_password # Função do hasher da pass
-from services.user_service import create_user, get_user_stats, delete_user, update_username, update_password
+from services.user_service import create_user, get_user_stats, delete_user, update_username, update_password, update_profile_image
 from utils.jwt_utils import oauth2_scheme, verify_access_token
 from core.firebase_utils import get_db
 
@@ -105,3 +105,21 @@ def update_password_route(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/ImgProfile")
+def update_profile_image_route(body: dict, token: str = Depends(oauth2_scheme)):
+    user_id = verify_access_token(token)
+    db = get_db()
+    profile_image_url = body.get("profile_image_url")
+    
+    if not profile_image_url:
+        raise HTTPException(status_code=400, detail="profile_image_url inválida")
+    
+    try:
+        update_profile_image(db, user_id, profile_image_url)
+        return {"success": True, "message": "updated"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    

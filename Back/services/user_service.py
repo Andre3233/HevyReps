@@ -111,3 +111,14 @@ def update_password(db, user_id: str, password_hash: str):
     user_ref.update({
         "password_hash": password_hash
     })
+    
+def update_profile_image(db, user_id: str, profile_image_url: str):
+    user_ref = db.collection("users").document(user_id)
+    
+    if not user_ref.get().exists:
+        raise ValueError("utilizador não encontrado")
+    
+    user_ref.update({
+        "profile_image_url": profile_image_url,
+    })
+    

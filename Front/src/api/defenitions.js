@@ -17,9 +17,6 @@ export async function deleteAccount(fetchWithAuth) {
 export async function updateUsername(fetchWithAuth, username) {
   const response = await fetchWithAuth(`${BACKEND_URL}/user/username`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({ username }),
   });
 
@@ -35,9 +32,6 @@ export async function updateUsername(fetchWithAuth, username) {
 export async function updatePassword(fetchWithAuth, password) {
   const response = await fetchWithAuth(`${BACKEND_URL}/user/password`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       password,
     }),
@@ -50,4 +44,19 @@ export async function updatePassword(fetchWithAuth, password) {
   }
 
   return data;
+}
+
+export async function updateImgProfile(fetchWithAuth, profile_image_url) {
+  const response = await fetchWithAuth(`${BACKEND_URL}/user/ImgProfile`, {
+    method: "PUT",
+    body: JSON.stringify({ profile_image_url }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.detail || "Erro ao atualizar ImgProfile");
+  }
+
+  return data
 }

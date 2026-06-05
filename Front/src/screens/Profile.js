@@ -131,7 +131,7 @@ export default function Profile() {
             <>
               <View style={styles.headerCenter}>
                 <View style={styles.profileImageWrapper}>
-                  <ImgDefault imageUrl={stats?.profile_image_url} size={100} />
+                  <ImgDefault imageUrl={stats?.profile_image_url} />
                 </View>
 
                 <Text style={styles.username}>

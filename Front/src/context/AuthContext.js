@@ -2,13 +2,14 @@ import { createContext, useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
-import { BACKEND_URL } from "../api/config";
+import { BACKEND_URL, CLOUDINARY_URL } from "../api/config";
 import { refreshAccessToken as refreshAccessTokenApi } from "../api/AuthToken";
 import { loginUser } from "../api/loginUser";
 import {
   deleteAccount as deleteAccountApi,
   updateUsername,
   updatePassword,
+  updateImgProfile,
 } from "../api/defenitions";
 
 export const AuthContext = createContext();
@@ -284,6 +285,25 @@ export function AuthProvider({ children }) {
     await updatePassword(fetchWithAuth, password);
   }
 
+  async function changeProfileImage(uri) {
+    const formData = new FormData();
+    formData.append("file", { uri, type: "image/jpeg", name: "profile.jpg" });
+    formData.append("upload_preset", "hevyreps_ImgProfiles ");
+
+    const cloudRes = await fetch(CLOUDINARY_URL, {
+      method: "POST",
+      body: formData,
+    });
+    const cloudData = await cloudRes.json();
+
+    const imageUrl = cloudData.secure_url;
+
+    const res = await updateImgProfile(fetchWithAuth, imageUrl);
+    const updatedUser = { ...user, profile_image_url: imageUrl };
+    setUser(updatedUser);
+    await AsyncStorage.setItem("@user", JSON.stringify(updatedUser));
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -299,6 +319,7 @@ export function AuthProvider({ children }) {
         deleteAccount,
         changeUsername,
         changePassword,
+        changeProfileImage,
       }}
     >
       {children}

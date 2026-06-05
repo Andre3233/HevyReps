@@ -6,16 +6,18 @@ import {
   Text,
   Pressable,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { styles } from "./style";
 
-export function ImgDefault() {
+export function ImgDefault({ imageUrl }) {
   return (
     <View style={styles.container}>
       <View style={styles.imageWrapper}>
         <Image
-          source={require("../../../assets/Logo.png")} // imagem padrão
+          source={
+            imageUrl ? { uri: imageUrl } : require("../../../assets/Logo.png")
+          }
           style={styles.img}
         />
       </View>
@@ -77,11 +79,19 @@ export function ImgProfile({ image, onChangeImage }) {
           <Pressable style={styles.modalContent}>
             <Text style={styles.modalTitle}>Escolhe a tua foto</Text>
             <View style={styles.modalOption}>
-              <TouchableOpacity onPress={pickImage} style={styles.modalOption} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={pickImage}
+                style={styles.modalOption}
+                activeOpacity={0.7}
+              >
                 <Text>Galeria</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={takePhoto} style={styles.modalOption} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={takePhoto}
+                style={styles.modalOption}
+                activeOpacity={0.7}
+              >
                 <Text>Câmara</Text>
               </TouchableOpacity>
             </View>
@@ -92,5 +102,53 @@ export function ImgProfile({ image, onChangeImage }) {
         </Pressable>
       </Modal>
     </View>
+  );
+}
+
+export function ImgPicker({ visible, onClose, onImageSelected }) {
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+    if (!result.canceled) {
+      await onImageSelected(result.assets[0].uri);
+    }
+    onClose();
+  };
+
+  const takePhoto = async () => {
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+    if (!result.canceled) {
+      await onImageSelected(result.assets[0].uri);
+    }
+    onClose();
+  };
+
+  return (
+    <Modal transparent animationType="fade" visible={visible}>
+      <Pressable style={styles.modalOverlay} onPress={onClose}>
+        <Pressable style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Escolhe a tua foto</Text>
+          <View style={styles.modalOption}>
+            <TouchableOpacity onPress={pickImage} activeOpacity={0.7}>
+              <Text>Galeria</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={takePhoto} activeOpacity={0.7}>
+              <Text>Câmara</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity onPress={onClose}>
+            <Text style={styles.cancel}>Cancelar</Text>
+          </TouchableOpacity>
+        </Pressable>
+      </Pressable>
+    </Modal>
   );
 }

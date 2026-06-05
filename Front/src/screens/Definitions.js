@@ -1,10 +1,11 @@
 import { StatusBar } from "expo-status-bar";
 import { View, Text, Alert, ScrollView, TouchableOpacity } from "react-native";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AuthContext } from "../context/AuthContext";
 import { styles } from "../styles/Defenitions.style";
+import { ImgPicker } from "../components/ImgProfile";
 
 function SettingsRow({ icon, label, onPress }) {
   return (
@@ -21,8 +22,10 @@ function SettingsRow({ icon, label, onPress }) {
 }
 
 export default function Defenitions() {
-  const { signOut, deleteAccount } = useContext(AuthContext);
+  const { signOut, deleteAccount, changeProfileImage } =
+    useContext(AuthContext);
   const navigation = useNavigation();
+  const [pickerVisible, setPickerVisible] = useState(false);
 
   function handleDelete() {
     Alert.alert("Apagar conta", "Esta ação é irreversível", [
@@ -78,6 +81,12 @@ export default function Defenitions() {
               navigation.navigate("EditAccount", { mode: "password" })
             }
           />
+          <View style={styles.separator} />
+          <SettingsRow
+            icon="photo-camera"
+            label="Alterar foto de perfil"
+            onPress={() => setPickerVisible(true)}
+          />
         </View>
 
         {/* Botões de sessão */}
@@ -101,6 +110,11 @@ export default function Defenitions() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <ImgPicker
+        visible={pickerVisible}
+        onClose={() => setPickerVisible(false)}
+        onImageSelected={changeProfileImage}
+      />
     </View>
   );
 }
