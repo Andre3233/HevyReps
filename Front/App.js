@@ -6,6 +6,9 @@ import * as NavigationBar from "expo-navigation-bar";
 import { colors } from "./src/styles/colors";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { WorkoutProvider } from "./src/context/WorkoutContext";
+import * as SplashScreen from "expo-splash-screen";
+
+SplashScreen.preventAutoHideAsync();
 export default function App() {
   useEffect(() => {
     if (Platform.OS === "android") {

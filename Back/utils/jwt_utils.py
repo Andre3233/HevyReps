@@ -55,7 +55,3 @@ def verify_access_token(token: str):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido"
         )
-    # No futuro, invalidar tokens quando:
-    # - password for alterada
-    # - conta for apagada
-    # Estratégia ainda por definir (expiração ou validação na BD)

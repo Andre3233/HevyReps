@@ -5,14 +5,23 @@ import UserRegister from "../screens/UserRegister";
 import Login from "../screens/Login";
 import Defenitions from "../screens/Definitions";
 import { AuthContext } from "../context/AuthContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import MainTabs from "./MainTabs";
 import DefenitionsStack from "./DefenitionsStack";
+
+import * as SplashScreen from "expo-splash-screen";
 
 const Stack = createNativeStackNavigator();
 
 export function Navigation() {
   const { signed, loading } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (!loading) {
+      SplashScreen.hideAsync();
+    }
+  }, [loading]);
+
   if (loading) return null;
   return (
     <NavigationContainer>
