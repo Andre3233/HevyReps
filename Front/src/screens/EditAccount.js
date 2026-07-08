@@ -61,6 +61,10 @@ export default function EditAccountScreen() {
         Alert.alert("Erro", "As passwords não coincidem.");
         return;
       }
+      if(password.length < 6){
+        Alert.alert("Erro","A palavra-passe tem de ter no mínimo 6 caracteres.")
+        return
+      }
       confirm(async () => {
         try {
           await changePassword(password);

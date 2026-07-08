@@ -21,7 +21,7 @@
     "android": {
       "package": "com.andre.hevyreps",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/Logo1.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": ["CAMERA"],

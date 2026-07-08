@@ -21,6 +21,8 @@ def register(user: UserCreate): # Enspoint para criar um novo utilizador
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail=" A palavra passe tem de ter pelo menos 6 caracteres")
 
 
     #Manta a resposta para o front

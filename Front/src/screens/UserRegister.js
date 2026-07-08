@@ -68,13 +68,16 @@ export default function UserRegister({ route }) {
     } else if (password !== confirmPassword) {
       newErros.confirmPassword =
         "As palavras-passe não coincidem. Tente novamente.";
+    } else if(password.length < 6){
+      newErros.confirmPassword =
+        "A palavra-passe tem de ter no mínimo 6 caracteres.";
     }
     setErrors(newErros);
 
     const hasError = Object.values(newErros).some((e) => e !== null);
     if (hasError) return; // Se ouver erro não envia nada para o BAck
 
-    //Envia os dadoa para o Back
+    //Envia os dados para o Back
     try {
       setLoading(true);
       const data = await registerUser({
@@ -94,7 +97,7 @@ export default function UserRegister({ route }) {
 
       if (err?.detail) {
         if (Array.isArray(err.detail)) {
-          //Erros dsa validações do Back
+          //Erros das validações do Back
           err.detail.forEach((e) => {
             if (e.loc && e.loc[0] && newErrors.hasOwnProperty(e.loc[0])) {
               newErrors[e.loc[0]] = e.msg;
