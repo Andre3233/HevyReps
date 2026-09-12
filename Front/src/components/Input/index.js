@@ -47,7 +47,7 @@ export function PasswordInput({ value, onChangeText, error, editable = true }) {
         placeholderTextColor="#94a3b8"
         value={value}
         onChangeText={onChangeText}
-        //secureTextEntry={!showPassword}
+        secureTextEntry={!showPassword}
         autoCapitalize="none"
         autoCorrect={false}
         editable={editable}
@@ -83,7 +83,7 @@ export function ConfirmPasswordInput({ value, onChangeText, error, editable }) {
         placeholderTextColor="#94a3b8"
         value={value}
         onChangeText={onChangeText}
-        //secureTextEntry={!showPassword}
+        secureTextEntry={!showPassword}
         autoCapitalize="none"
         autoCorrect={false}
         editable={editable}
